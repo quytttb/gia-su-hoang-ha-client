@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
 import SectionHeading from '../components/shared/SectionHeading';
+import LazyImage from '../components/shared/LazyImage';
 import { CenterInfo, Tutor } from '../types';
 import { getCenterInfo, getTutors } from '../services/dataService';
 import Chatbot from '../components/shared/Chatbot';
@@ -92,11 +93,7 @@ const AboutPage = () => {
                 className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg"
               >
                 <div className="h-64 overflow-hidden">
-                  <img
-                    src={tutor.imageUrl}
-                    alt={tutor.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <LazyImage src={tutor.imageUrl} alt={tutor.name} className="w-full h-full" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-xl font-bold text-gray-800 mb-1">{tutor.name}</h3>

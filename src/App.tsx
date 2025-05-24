@@ -1,26 +1,32 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
-import CoursesPage from './pages/CoursesPage';
-import CourseDetailPage from './pages/CourseDetailPage';
-import CourseRegistrationPage from './pages/CourseRegistrationPage';
-import SchedulePage from './pages/SchedulePage';
-import ContactPage from './pages/ContactPage';
-import AdminPage from './pages/AdminPage';
+import { Suspense, lazy } from 'react';
+import Loading from './components/shared/Loading';
+
+// Lazy load pages for better performance
+const HomePage = lazy(() => import('./pages/HomePage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const CoursesPage = lazy(() => import('./pages/CoursesPage'));
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'));
+const CourseRegistrationPage = lazy(() => import('./pages/CourseRegistrationPage'));
+const SchedulePage = lazy(() => import('./pages/SchedulePage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 
 const App = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/courses" element={<CoursesPage />} />
-        <Route path="/courses/:id" element={<CourseDetailPage />} />
-        <Route path="/courses/:id/register" element={<CourseRegistrationPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-      </Routes>
+      <Suspense fallback={<Loading message="Đang tải trang..." />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:id" element={<CourseDetailPage />} />
+          <Route path="/courses/:id/register" element={<CourseRegistrationPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

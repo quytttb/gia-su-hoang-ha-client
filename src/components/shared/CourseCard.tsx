@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Course } from '../../types';
 import { calculateDiscountedPrice, formatCurrency, isDiscountValid } from '../../utils/helpers';
+import LazyImage from './LazyImage';
 
 interface CourseCardProps {
   course: Course;
@@ -25,7 +26,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg">
       <div className="h-48 overflow-hidden">
-        <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+        <LazyImage src={imageUrl} alt={name} className="w-full h-full" />
       </div>
 
       <div className="p-5">

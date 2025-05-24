@@ -9,6 +9,7 @@ export interface CenterInfo {
   history: string;
   mission: string;
   vision: string;
+  slogan: string;
   workingHours: WorkingHours;
 }
 
