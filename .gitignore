@@ -49,3 +49,4 @@ coverage
 
 # Project exclude paths
 /vite.config.js
+.vercel

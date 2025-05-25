@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { Course } from '../../types';
 import { calculateDiscountedPrice, formatCurrency, isDiscountValid } from '../../utils/helpers';
 import LazyImage from './LazyImage';
+import { trackCourseView, trackUserEngagement } from '../../utils/analytics';
+import { trackCourseViewEcommerce, trackAddToCart } from '../../utils/ecommerce';
 
 interface CourseCardProps {
   course: Course;
@@ -63,13 +65,35 @@ const CourseCard = ({ course }: CourseCardProps) => {
         </div>
 
         <div className="flex space-x-2">
-          <Link to={`/courses/${id}`} className="btn-primary flex-1 text-center">
+          <Link
+            to={`/courses/${id}`}
+            className="btn-primary flex-1 text-center"
+            onClick={() => {
+              trackCourseView(id.toString(), name);
+              trackCourseViewEcommerce({
+                id: id.toString(),
+                name,
+                price: finalPrice,
+                category: targetAudience,
+              });
+              trackUserEngagement('click', 'course_detail_button');
+            }}
+          >
             Xem chi tiết
           </Link>
 
           <Link
             to={`/courses/${id}/register`}
             className="border border-primary text-primary hover:bg-primary hover:text-white transition-colors px-4 py-2 rounded text-center"
+            onClick={() => {
+              trackAddToCart({
+                id: id.toString(),
+                name,
+                price: finalPrice,
+                category: targetAudience,
+              });
+              trackUserEngagement('click', 'course_register_button');
+            }}
           >
             Đăng ký
           </Link>

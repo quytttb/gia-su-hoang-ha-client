@@ -5,6 +5,7 @@ import { Course, Inquiry, Registration, Schedule } from '../types';
 import { getAllCourses, getAllSchedules } from '../services/dataService';
 import { formatCurrency, formatDate, generateId } from '../utils/helpers';
 import { mockData } from '../services/mockData';
+import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
 
 // Helper to get the color based on status
 const getStatusColor = (status: string) => {
@@ -341,10 +342,10 @@ const AdminPage = () => {
         prevSchedules.map(schedule =>
           schedule.id === editingSchedule.id
             ? ({
-                ...schedule,
-                ...scheduleFormData,
-                courseName,
-              } as Schedule)
+              ...schedule,
+              ...scheduleFormData,
+              courseName,
+            } as Schedule)
             : schedule
         )
       );
@@ -395,10 +396,10 @@ const AdminPage = () => {
       prev.map(inquiry =>
         inquiry.id === inquiryId
           ? {
-              ...inquiry,
-              status: 'resolved',
-              response: inquiryResponse,
-            }
+            ...inquiry,
+            status: 'resolved',
+            response: inquiryResponse,
+          }
           : inquiry
       )
     );
@@ -477,6 +478,15 @@ const AdminPage = () => {
                 }
               >
                 Tin nhắn
+              </Tab>
+              <Tab
+                className={({ selected }: { selected: boolean }) =>
+                  `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
+                  ${selected ? 'bg-primary text-white shadow' : 'text-gray-700 hover:bg-blue-100'}
+                  `
+                }
+              >
+                Analytics
               </Tab>
             </Tab.List>
 
@@ -1176,6 +1186,11 @@ const AdminPage = () => {
                     )}
                   </div>
                 </div>
+              </Tab.Panel>
+
+              {/* Analytics Panel */}
+              <Tab.Panel>
+                <AnalyticsDashboard />
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>

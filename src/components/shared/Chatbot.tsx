@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
+import {
+  trackChatbotOpen,
+  trackChatbotClose,
+  trackQuickReplyClick
+} from '../../utils/chatbotAnalytics';
 
 export type ChatMessage = {
   id: string;
@@ -180,6 +185,8 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
   };
 
   const handleQuickReply = (reply: string) => {
+    trackQuickReplyClick(reply);
+
     const newUserMessage: ChatMessage = {
       id: Date.now().toString(),
       content: reply,
@@ -319,6 +326,11 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
   };
 
   const toggleChat = () => {
+    if (!isChatOpen) {
+      trackChatbotOpen();
+    } else {
+      trackChatbotClose();
+    }
     setIsChatOpen(!isChatOpen);
   };
 
@@ -328,11 +340,10 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
     return (
       <div key={message.id} className="space-y-2">
         <div
-          className={`max-w-[85%] p-3 rounded-lg ${
-            isBot
-              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 rounded-br-none border border-blue-100'
-              : 'bg-gradient-to-r from-primary to-blue-600 text-white rounded-bl-none ml-auto'
-          }`}
+          className={`max-w-[85%] p-3 rounded-lg ${isBot
+            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 rounded-br-none border border-blue-100'
+            : 'bg-gradient-to-r from-primary to-blue-600 text-white rounded-bl-none ml-auto'
+            }`}
         >
           <div className="whitespace-pre-line text-sm leading-relaxed">
             {parseMarkdown(message.content)}
