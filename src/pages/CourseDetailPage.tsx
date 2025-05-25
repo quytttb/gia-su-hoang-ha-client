@@ -10,6 +10,8 @@ import {
   formatDate,
   isDiscountValid,
 } from '../utils/helpers';
+import { generateCourseSEO, generateCourseStructuredData } from '../utils/seo';
+import SEOHead from '../components/shared/SEOHead';
 import Chatbot from '../components/shared/Chatbot';
 
 const CourseDetailPage = () => {
@@ -74,6 +76,14 @@ const CourseDetailPage = () => {
 
   return (
     <Layout>
+      {/* SEO Head */}
+      {course && (
+        <SEOHead
+          seoData={generateCourseSEO(course.name, course.description, id!)}
+          structuredData={generateCourseStructuredData(course)}
+        />
+      )}
+
       {/* Hero Section */}
       <section className="bg-gray-100 py-16">
         <div className="container-custom">

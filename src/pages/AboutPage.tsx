@@ -4,6 +4,7 @@ import SectionHeading from '../components/shared/SectionHeading';
 import LazyImage from '../components/shared/LazyImage';
 import { CenterInfo, Tutor } from '../types';
 import { getCenterInfo, getTutors } from '../services/dataService';
+import { updateSEO, seoData } from '../utils/seo';
 import Chatbot from '../components/shared/Chatbot';
 
 const AboutPage = () => {
@@ -12,6 +13,9 @@ const AboutPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Update SEO for about page
+    updateSEO(seoData.about);
+
     const fetchData = async () => {
       try {
         setLoading(true);

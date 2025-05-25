@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://giasuhoangha.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Block admin and private areas
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /src/
+
+# Allow important pages
+Allow: /
+Allow: /about
+Allow: /courses
+Allow: /courses/*
+Allow: /schedule
+Allow: /contact 

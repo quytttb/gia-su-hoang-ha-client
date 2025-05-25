@@ -4,9 +4,9 @@ import { generateId } from '../utils/helpers';
 import axios from 'axios';
 
 // Base URL for API calls
-// TODO: Update this to your actual API URL when deploying
 const API_BASE_URL =
-  process.env.NODE_ENV === 'production' ? 'https://api.giasuhoangha.com/api' : '/api';
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD ? 'https://api.giasuhoangha.com/api' : '/api');
 
 // Create axios instance
 const api = axios.create({
@@ -14,11 +14,12 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
 
 // Function to determine whether to use mock data or real API
-// Set this to false when the backend API is ready
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA =
+  import.meta.env.VITE_USE_MOCK_DATA === 'true' || import.meta.env.VITE_USE_MOCK_DATA === undefined;
 
 // Get center information
 export const getCenterInfo = async (): Promise<CenterInfo> => {

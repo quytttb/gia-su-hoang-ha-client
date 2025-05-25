@@ -8,6 +8,7 @@ import {
   getSchedulesByUserPhone,
 } from '../services/dataService';
 import { formatDate } from '../utils/helpers';
+import { updateSEO, seoData } from '../utils/seo';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format, parseISO } from 'date-fns';
@@ -32,6 +33,9 @@ const SchedulePage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Update SEO for schedule page
+    updateSEO(seoData.schedule);
+
     const fetchSchedules = async () => {
       try {
         setLoading(true);

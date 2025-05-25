@@ -2,14 +2,21 @@ import { useEffect, useState, FormEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Course, Registration } from '../types';
-import { getCourseById, registerForCourse } from '../services/dataService';
+import { getCourseById } from '../services/dataService';
+import { sendRegistrationEmail, sendAutoReplyEmail, initEmailJS } from '../services/emailService';
 import {
   calculateDiscountedPrice,
   formatCurrency,
   isDiscountValid,
-  validateEmail,
-  validatePhone,
+  generateId,
 } from '../utils/helpers';
+import {
+  validateAndSanitizeEmail,
+  validateAndSanitizePhone,
+  validateAndSanitizeName,
+  defaultRateLimiter,
+  getClientIdentifier,
+} from '../utils/security';
 import Chatbot from '../components/shared/Chatbot';
 
 const CourseRegistrationPage = () => {
@@ -42,6 +49,9 @@ const CourseRegistrationPage = () => {
     };
 
     fetchCourse();
+
+    // Initialize EmailJS
+    initEmailJS();
   }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,20 +62,22 @@ const CourseRegistrationPage = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Vui lòng nhập họ tên';
+    // Validate and sanitize name
+    const nameValidation = validateAndSanitizeName(formData.name);
+    if (!nameValidation.isValid) {
+      newErrors.name = nameValidation.error || 'Họ tên không hợp lệ';
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Vui lòng nhập số điện thoại';
-    } else if (!validatePhone(formData.phone)) {
-      newErrors.phone = 'Số điện thoại không hợp lệ';
+    // Validate and sanitize phone
+    const phoneValidation = validateAndSanitizePhone(formData.phone);
+    if (!phoneValidation.isValid) {
+      newErrors.phone = phoneValidation.error || 'Số điện thoại không hợp lệ';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Vui lòng nhập email';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email không hợp lệ';
+    // Validate and sanitize email
+    const emailValidation = validateAndSanitizeEmail(formData.email);
+    if (!emailValidation.isValid) {
+      newErrors.email = emailValidation.error || 'Email không hợp lệ';
     }
 
     setErrors(newErrors);
@@ -75,18 +87,61 @@ const CourseRegistrationPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    // Check rate limiting
+    const clientId = getClientIdentifier();
+    if (!defaultRateLimiter.isAllowed(clientId)) {
+      const remaining = defaultRateLimiter.getRemainingRequests(clientId);
+      alert(`Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau. Còn lại: ${remaining} yêu cầu.`);
+      return;
+    }
+
     if (!validateForm() || !id || !course) {
+      return;
+    }
+
+    // Get sanitized data
+    const nameValidation = validateAndSanitizeName(formData.name);
+    const phoneValidation = validateAndSanitizePhone(formData.phone);
+    const emailValidation = validateAndSanitizeEmail(formData.email);
+
+    // Double-check all validations passed
+    if (!nameValidation.isValid || !phoneValidation.isValid || !emailValidation.isValid) {
       return;
     }
 
     try {
       setSubmitting(true);
-      const result = await registerForCourse(formData.name, formData.phone, formData.email, id);
 
-      setRegistration(result);
+      // Send registration email
+      const result = await sendRegistrationEmail(
+        nameValidation.sanitized,
+        emailValidation.sanitized,
+        phoneValidation.sanitized,
+        course.name,
+        id
+      );
+
+      if (result.success) {
+        // Send auto-reply to student
+        await sendAutoReplyEmail(nameValidation.sanitized, emailValidation.sanitized, true);
+
+        // Create registration object for display
+        const registrationData: Registration = {
+          id: generateId(),
+          userId: generateId(), // Generate a user ID for this registration
+          courseId: id,
+          registrationDate: new Date().toLocaleDateString('vi-VN'),
+          status: 'pending',
+          paymentStatus: 'pending',
+        };
+
+        setRegistration(registrationData);
+      } else {
+        alert(result.message);
+      }
     } catch (error) {
       console.error('Error submitting registration:', error);
-      alert('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
+      alert('Đã có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ trực tiếp qua WhatsApp.');
     } finally {
       setSubmitting(false);
     }
@@ -249,7 +304,7 @@ const CourseRegistrationPage = () => {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="btn-primary w-full flex items-center justify-center"
+                      className="btn-primary w-full flex items-center justify-center mb-4"
                     >
                       {submitting ? (
                         <>
@@ -279,6 +334,26 @@ const CourseRegistrationPage = () => {
                         'Đăng ký ngay'
                       )}
                     </button>
+
+                    {/* Facebook Alternative */}
+                    <div className="text-center">
+                      <p className="text-gray-500 text-sm mb-3">Hoặc tư vấn qua:</p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          window.open(
+                            'https://www.facebook.com/profile.php?id=61575087818708',
+                            '_blank'
+                          )
+                        }
+                        className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                        <span>Tư vấn qua Facebook</span>
+                      </button>
+                    </div>
                   </div>
                 </form>
               </div>

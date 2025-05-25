@@ -4,6 +4,7 @@ import SectionHeading from '../components/shared/SectionHeading';
 import CourseCard from '../components/shared/CourseCard';
 import { Course } from '../types';
 import { getAllCourses } from '../services/dataService';
+import { updateSEO, seoData } from '../utils/seo';
 import Chatbot from '../components/shared/Chatbot';
 
 const CoursesPage = () => {
@@ -14,6 +15,9 @@ const CoursesPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Update SEO for courses page
+    updateSEO(seoData.courses);
+
     const fetchData = async () => {
       try {
         setLoading(true);

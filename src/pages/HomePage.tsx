@@ -6,6 +6,7 @@ import SectionHeading from '../components/shared/SectionHeading';
 import CourseCard from '../components/shared/CourseCard';
 import { Banner as BannerType, CenterInfo, Course } from '../types';
 import { getBanners, getCenterInfo, getFeaturedCourses } from '../services/dataService';
+import { updateSEO, seoData } from '../utils/seo';
 import Chatbot from '../components/shared/Chatbot';
 
 const HomePage = () => {
@@ -15,6 +16,9 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Update SEO for homepage
+    updateSEO(seoData.home);
+
     const fetchData = async () => {
       try {
         setLoading(true);

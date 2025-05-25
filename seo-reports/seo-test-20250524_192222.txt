@@ -1,0 +1,97 @@
+🔍 SEO Testing Report - Sat 24 May 19:22:22 +07 2025
+URL: http://localhost:4173
+=================================================
+
+📋 1. WEBSITE ACCESSIBILITY
+---
+✅ Website is accessible
+
+📋 2. META TAGS
+---
+Title Tag:
+<title>Trung tâm Gia Sư Hoàng Hà - Dẫn lối tri thức, vững bước tương lai</title>
+
+Meta Description:
+
+Meta Keywords:
+
+📋 3. OPEN GRAPH TAGS
+---
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://giasuhoangha.com/" />
+<meta property="og:title" content="Trung tâm Gia Sư Hoàng Hà - Dẫn lối tri thức, vững bước tương lai" />
+<meta property="og:image" content="https://giasuhoangha.com/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="vi_VN" />
+<meta property="og:site_name" content="Trung tâm Gia Sư Hoàng Hà" />
+
+📋 4. TWITTER CARDS
+---
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content="https://giasuhoangha.com/" />
+<meta property="twitter:title" content="Trung tâm Gia Sư Hoàng Hà - Dẫn lối tri thức, vững bước tương lai" />
+<meta property="twitter:image" content="https://giasuhoangha.com/og-image.jpg" />
+
+📋 5. STRUCTURED DATA
+---
+✅ JSON-LD structured data found
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Trung tâm Gia Sư Hoàng Hà",
+    "alternateName": "Gia Sư Hoàng Hà",
+    "description": "Trung tâm Gia Sư Hoàng Hà cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa. Đội ngũ giáo viên giỏi, phương pháp giảng dạy hiệu quả.",
+    "url": "https://giasuhoangha.com",
+    "logo": "https://giasuhoangha.com/logo.png",
+    "image": "https://giasuhoangha.com/og-image.jpg",
+    "telephone": "+84385510892",
+
+📋 6. SITEMAP
+---
+✅ Sitemap is accessible
+Number of URLs in sitemap: 11
+
+📋 7. ROBOTS.TXT
+---
+✅ Robots.txt is accessible
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://giasuhoangha.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Block admin and private areas
+
+📋 8. PAGE SPEED (Basic)
+---
+Page load time: 0.000989s
+✅ Good load time (< 3s)
+
+📋 9. MOBILE-FRIENDLY (Basic)
+---
+✅ Viewport meta tag found
+
+📋 10. SECURITY
+---
+⚠️ Using HTTP (consider HTTPS for production)
+
+📋 11. HEADING STRUCTURE
+---
+H1 tags: 0
+H2 tags: 0
+H3 tags: 0
+❌ No H1 tag found
+
+📋 12. INTERNAL LINKS
+---
+Internal links found: 2
+
+📋 SUMMARY
+---
+SEO test completed at Sat 24 May 19:22:22 +07 2025
+Report saved to: seo-reports/seo-test-20250524_192222.txt

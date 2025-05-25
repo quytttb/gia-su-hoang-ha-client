@@ -1,7 +1,21 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
-import { submitInquiry } from '../services/dataService';
-import { validateEmail, validatePhone } from '../utils/helpers';
+import {
+  sendContactEmail,
+  sendAutoReplyEmail,
+  initEmailJS,
+  getEmailServiceStatus,
+} from '../services/emailService';
+
+import {
+  validateAndSanitizeEmail,
+  validateAndSanitizePhone,
+  validateAndSanitizeName,
+  validateAndSanitizeMessage,
+  defaultRateLimiter,
+  getClientIdentifier,
+} from '../utils/security';
+import { updateSEO, seoData } from '../utils/seo';
 import SectionHeading from '../components/shared/SectionHeading';
 import Chatbot from '../components/shared/Chatbot';
 
@@ -17,6 +31,21 @@ const ContactPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    // Update SEO for contact page
+    updateSEO(seoData.contact);
+
+    // Initialize EmailJS
+    initEmailJS();
+
+    // Check email service status
+    const status = getEmailServiceStatus();
+
+    if (!status.isConfigured) {
+      console.warn('EmailJS not configured. Missing:', status.missingFields);
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -25,24 +54,28 @@ const ContactPage = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Vui lòng nhập họ tên';
+    // Validate and sanitize name
+    const nameValidation = validateAndSanitizeName(formData.name);
+    if (!nameValidation.isValid) {
+      newErrors.name = nameValidation.error || 'Họ tên không hợp lệ';
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Vui lòng nhập số điện thoại';
-    } else if (!validatePhone(formData.phone)) {
-      newErrors.phone = 'Số điện thoại không hợp lệ';
+    // Validate and sanitize phone
+    const phoneValidation = validateAndSanitizePhone(formData.phone);
+    if (!phoneValidation.isValid) {
+      newErrors.phone = phoneValidation.error || 'Số điện thoại không hợp lệ';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Vui lòng nhập email';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email không hợp lệ';
+    // Validate and sanitize email
+    const emailValidation = validateAndSanitizeEmail(formData.email);
+    if (!emailValidation.isValid) {
+      newErrors.email = emailValidation.error || 'Email không hợp lệ';
     }
 
-    if (!formData.message.trim()) {
-      newErrors.message = 'Vui lòng nhập tin nhắn';
+    // Validate and sanitize message
+    const messageValidation = validateAndSanitizeMessage(formData.message);
+    if (!messageValidation.isValid) {
+      newErrors.message = messageValidation.error || 'Tin nhắn không hợp lệ';
     }
 
     setErrors(newErrors);
@@ -52,24 +85,66 @@ const ContactPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    // Check rate limiting
+    const clientId = getClientIdentifier();
+    if (!defaultRateLimiter.isAllowed(clientId)) {
+      const remaining = defaultRateLimiter.getRemainingRequests(clientId);
+      alert(`Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau. Còn lại: ${remaining} yêu cầu.`);
+      return;
+    }
+
     if (!validateForm()) {
+      return;
+    }
+
+    // Get sanitized data
+    const nameValidation = validateAndSanitizeName(formData.name);
+    const phoneValidation = validateAndSanitizePhone(formData.phone);
+    const emailValidation = validateAndSanitizeEmail(formData.email);
+    const messageValidation = validateAndSanitizeMessage(formData.message);
+
+    // Double-check all validations passed
+    if (
+      !nameValidation.isValid ||
+      !phoneValidation.isValid ||
+      !emailValidation.isValid ||
+      !messageValidation.isValid
+    ) {
       return;
     }
 
     try {
       setLoading(true);
-      await submitInquiry(formData.name, formData.phone, formData.email, formData.message);
 
-      setSuccess(true);
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        message: '',
-      });
+      // Send contact email
+      const result = await sendContactEmail(
+        nameValidation.sanitized,
+        emailValidation.sanitized,
+        phoneValidation.sanitized,
+        messageValidation.sanitized
+      );
+
+      if (result.success) {
+        // Send auto-reply to customer
+        await sendAutoReplyEmail(nameValidation.sanitized, emailValidation.sanitized, false);
+
+        setSuccess(true);
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          message: '',
+        });
+
+        // Show success message
+        alert(result.message);
+      } else {
+        // Show error message
+        alert(result.message);
+      }
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      alert('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
+      alert('Đã có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ trực tiếp qua số điện thoại.');
     } finally {
       setLoading(false);
     }
@@ -172,6 +247,32 @@ const ContactPage = () => {
                   <div>
                     <h3 className="text-xl font-semibold text-gray-800 mb-1">Email</h3>
                     <p className="text-gray-600">lienhe@giasuhoangha.com</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="bg-primary bg-opacity-10 p-3 rounded-full">
+                    <svg className="h-6 w-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-1">Facebook</h3>
+                    <p className="text-gray-600 mb-2">Gia Sư Hoàng Hà Official</p>
+                    <button
+                      onClick={() =>
+                        window.open(
+                          'https://www.facebook.com/profile.php?id=61575087818708',
+                          '_blank'
+                        )
+                      }
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                      </svg>
+                      <span>Nhắn tin Facebook</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -314,7 +415,7 @@ const ContactPage = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="btn-primary w-full flex items-center justify-center"
+                      className="btn-primary w-full flex items-center justify-center mb-4"
                     >
                       {loading ? (
                         <>
@@ -344,6 +445,26 @@ const ContactPage = () => {
                         'Gửi tin nhắn'
                       )}
                     </button>
+
+                    {/* Facebook Alternative */}
+                    <div className="text-center">
+                      <p className="text-gray-500 text-sm mb-3">Hoặc liên hệ trực tiếp qua:</p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          window.open(
+                            'https://www.facebook.com/profile.php?id=61575087818708',
+                            '_blank'
+                          )
+                        }
+                        className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                        <span>Nhắn tin qua Facebook</span>
+                      </button>
+                    </div>
                   </div>
                 </form>
               )}

@@ -1,0 +1,8 @@
+🔍 SEO Testing Report - Sat 24 May 19:33:04 +07 2025
+URL: http://localhost:4173
+=================================================
+
+📋 1. WEBSITE ACCESSIBILITY
+---
+❌ Website is not accessible
+Cannot proceed with SEO tests. Please check if the website is running.
