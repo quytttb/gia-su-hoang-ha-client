@@ -181,10 +181,10 @@ trackFormInteractions();
 - **CLS**: < 0.1 (Good), 0.1-0.25 (Needs Improvement), > 0.25 (Poor)
 - **TTFB**: < 0.8s (Good), 0.8-1.8s (Needs Improvement), > 1.8s (Poor)
 
-### **Real-time Performance Display**
-- **PerformanceMonitor** component hiển thị metrics trực tiếp
-- **Color-coded scoring** (Green/Yellow/Red)
+### **Performance Data Collection**
 - **Automatic performance tracking** on page load
+- **Core Web Vitals** sent to GA4 for analysis
+- **Performance metrics** available in GA4 reports
 
 ---
 
@@ -244,13 +244,11 @@ export const initGA = () => {
 ```typescript
 // src/App.tsx
 import AnalyticsTracker from './components/shared/AnalyticsTracker';
-import PerformanceMonitor from './components/shared/PerformanceMonitor';
 
 function App() {
   return (
     <>
       <AnalyticsTracker />
-      <PerformanceMonitor />
       {/* App content */}
     </>
   );

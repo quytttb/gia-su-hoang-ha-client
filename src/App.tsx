@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import Loading from './components/shared/Loading';
 import AnalyticsTracker from './components/shared/AnalyticsTracker';
-import PerformanceMonitor from './components/shared/PerformanceMonitor';
 
 // Lazy load pages for better performance
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -18,7 +17,6 @@ const App = () => {
   return (
     <BrowserRouter>
       <AnalyticsTracker />
-      <PerformanceMonitor showDetails={true} />
       <Suspense fallback={<Loading message="Đang tải trang..." />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
