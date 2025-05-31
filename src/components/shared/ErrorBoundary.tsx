@@ -1,8 +1,10 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import ErrorDisplay from './ErrorDisplay';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  errorType?: 'error' | 'warning' | 'info';
 }
 
 interface State {
@@ -31,35 +33,13 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-[400px] flex items-center justify-center">
-          <div className="text-center p-8">
-            <div className="mb-4">
-              <svg
-                className="mx-auto h-16 w-16 text-red-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Đã có lỗi xảy ra</h2>
-            <p className="text-gray-600 mb-4">
-              Xin lỗi, đã có lỗi không mong muốn xảy ra. Vui lòng thử lại sau.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-primary text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
-            >
-              Tải lại trang
-            </button>
-          </div>
-        </div>
+        <ErrorDisplay
+          fullPage
+          message="Đã có lỗi xảy ra"
+          details={this.state.error?.message || "Xin lỗi, đã có lỗi không mong muốn xảy ra. Vui lòng thử lại sau."}
+          retryLabel="Tải lại trang"
+          type={this.props.errorType || 'error'}
+        />
       );
     }
 

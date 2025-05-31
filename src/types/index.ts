@@ -24,6 +24,10 @@ export interface Banner {
   title: string;
   subtitle: string;
   link?: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Team types
@@ -48,6 +52,7 @@ export interface Course {
   imageUrl: string;
   featured: boolean;
   category: string;
+  isActive?: boolean;
 }
 
 // Schedule types

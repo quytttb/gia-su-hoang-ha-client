@@ -136,7 +136,7 @@ export const sendAutoReplyEmail = async (
       center_phone: '0385.510.892 - 0962.390.161',
       center_address: '265 - Đường 06 - Mặt Bằng 08, Phường Nam Ngạn, Thanh Hóa',
       message_type: isRegistration ? 'đăng ký khóa học' : 'liên hệ',
-      reply_to: 'lienhe@giasuhoangha.com',
+      reply_to: 'giasuhoangha.tpth@gmail.com',
     };
 
     await emailjs.send(EMAILJS_SERVICE_ID, 'template_auto_reply', templateParams);

@@ -1,12 +1,17 @@
 import { Link } from 'react-router-dom';
+import Logo from '../shared/Logo';
 
-const Footer = () => {
+interface FooterProps {
+  isContactPage?: boolean;
+}
+
+const Footer = ({ isContactPage = false }: FooterProps) => {
   return (
-    <footer className="bg-gray-900 text-white py-10">
+    <footer className="bg-gray-900 dark:bg-gray-800 text-white py-10">
       <div className="container-custom">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Gia Sư Hoàng Hà</h3>
+            <Logo variant="text" size="lg" linkTo="/" className="mb-4" />
             <p className="text-gray-300 mb-2">Trung tâm gia sư uy tín tại Thanh Hóa</p>
             <p className="text-gray-300">Mang đến kiến thức và kỹ năng cho thế hệ trẻ</p>
           </div>
@@ -49,7 +54,7 @@ const Footer = () => {
                 265 - ĐƯỜNG 06 - MẶT BẰNG 08, PHƯỜNG NAM NGẠN, THÀNH PHỐ THANH HOÁ, TỈNH THANH HOÁ
               </p>
               <p className="mb-2">Điện thoại: 0385.510.892 - 0962.390.161</p>
-              <p className="mb-2">Email: lienhe@giasuhoangha.com</p>
+              <p className="mb-2">Email: giasuhoangha.tpth@gmail.com</p>
             </address>
           </div>
 
@@ -59,18 +64,20 @@ const Footer = () => {
               <li className="mb-2">Thứ 2 - Thứ 6: 7:30 - 20:00</li>
               <li className="mb-2">Thứ 7 - Chủ nhật: 8:00 - 17:00</li>
             </ul>
-            <div className="mt-4 rounded overflow-hidden shadow">
-              <iframe
-                title="Google Maps - Gia Sư Hoàng Hà"
-                src="https://www.google.com/maps?q=265%20%C4%90%C6%B0%E1%BB%9Dng%2006%2C%20M%E1%BA%B7t%20B%E1%BA%B1ng%2008%2C%20Ph%C6%B0%E1%BB%9Dng%20Nam%20Ng%E1%BA%A1n%2C%20Th%C3%A0nh%20Ph%E1%BB%91%20Thanh%20Ho%C3%A1%2C%20T%E1%BB%89nh%20Thanh%20Ho%C3%A1&output=embed"
-                width="100%"
-                height="150"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
-            </div>
+            {!isContactPage && (
+              <div className="mt-4 rounded overflow-hidden shadow">
+                <iframe
+                  title="Google Maps - Gia Sư Hoàng Hà"
+                  src="https://www.google.com/maps?q=265%20%C4%90%C6%B0%E1%BB%9Dng%2006%2C%20M%E1%BA%B7t%20B%E1%BA%B1ng%2008%2C%20Ph%C6%B0%E1%BB%9Dng%20Nam%20Ng%E1%BA%A1n%2C%20Th%C3%A0nh%20Ph%E1%BB%91%20Thanh%20Ho%C3%A1%2C%20T%E1%BB%89nh%20Thanh%20Ho%C3%A1&output=embed"
+                  width="100%"
+                  height="150"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            )}
           </div>
         </div>
 

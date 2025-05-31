@@ -10,25 +10,30 @@ interface BannerProps {
 const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Filter only active banners and sort by order
+  const activeBanners = banners
+    .filter(banner => banner.isActive)
+    .sort((a, b) => a.order - b.order);
+
   useEffect(() => {
-    if (!autoplay || banners.length <= 1) return;
+    if (!autoplay || activeBanners.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentIndex(prevIndex => (prevIndex + 1) % banners.length);
+      setCurrentIndex(prevIndex => (prevIndex + 1) % activeBanners.length);
     }, interval);
 
     return () => clearInterval(timer);
-  }, [autoplay, banners.length, interval]);
+  }, [autoplay, activeBanners.length, interval]);
 
   const handlePrev = () => {
-    setCurrentIndex(prevIndex => (prevIndex - 1 + banners.length) % banners.length);
+    setCurrentIndex(prevIndex => (prevIndex - 1 + activeBanners.length) % activeBanners.length);
   };
 
   const handleNext = () => {
-    setCurrentIndex(prevIndex => (prevIndex + 1) % banners.length);
+    setCurrentIndex(prevIndex => (prevIndex + 1) % activeBanners.length);
   };
 
-  if (banners.length === 0) {
+  if (activeBanners.length === 0) {
     return null;
   }
 
@@ -39,7 +44,7 @@ const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
         className="flex transition-transform duration-500"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
-        {banners.map(banner => (
+        {activeBanners.map(banner => (
           <div key={banner.id} className="w-full flex-shrink-0">
             <div
               className="h-[400px] bg-cover bg-center relative"
@@ -62,7 +67,7 @@ const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
       </div>
 
       {/* Navigation Arrows */}
-      {banners.length > 1 && (
+      {activeBanners.length > 1 && (
         <>
           <button
             className="absolute top-1/2 left-4 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
@@ -101,14 +106,13 @@ const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
       )}
 
       {/* Indicators */}
-      {banners.length > 1 && (
+      {activeBanners.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-          {banners.map((_, index) => (
+          {activeBanners.map((_, index) => (
             <button
               key={index}
-              className={`w-3 h-3 rounded-full ${
-                index === currentIndex ? 'bg-primary' : 'bg-white'
-              }`}
+              className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-primary' : 'bg-white'
+                }`}
               onClick={() => setCurrentIndex(index)}
             />
           ))}

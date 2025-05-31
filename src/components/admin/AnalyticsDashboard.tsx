@@ -89,8 +89,8 @@ const AnalyticsDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderLeftColor: color }}>
                <div className="flex items-center justify-between">
                     <div>
-                         <p className="text-sm font-medium text-gray-600">{title}</p>
-                         <p className="text-2xl font-bold text-gray-900">{value}</p>
+                         <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+                         <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
                          {trend && (
                               <p className="text-sm text-green-600 mt-1">
                                    ↗ {trend}
@@ -108,8 +108,8 @@ const AnalyticsDashboard: React.FC = () => {
           <div className="space-y-6">
                {/* Header */}
                <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h2>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Analytics Dashboard</h2>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                          <ClockIcon className="h-4 w-4" />
                          <span>Cập nhật: {new Date().toLocaleTimeString('vi-VN')}</span>
                     </div>
@@ -179,14 +179,14 @@ const AnalyticsDashboard: React.FC = () => {
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Top Pages */}
                     <div className="bg-white rounded-lg shadow-md p-6">
-                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Trang phổ biến nhất</h3>
+                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Trang phổ biến nhất</h3>
                          <div className="space-y-3">
                               {topPages.map((page, index) => (
                                    <div key={index} className="flex items-center justify-between">
                                         <div className="flex-1">
                                              <div className="flex items-center justify-between mb-1">
-                                                  <span className="text-sm font-medium text-gray-900">{page.page}</span>
-                                                  <span className="text-sm text-gray-500">{page.views.toLocaleString()}</span>
+                                                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{page.page}</span>
+                                                  <span className="text-sm text-gray-500 dark:text-gray-400">{page.views.toLocaleString()}</span>
                                              </div>
                                              <div className="w-full bg-gray-200 rounded-full h-2">
                                                   <div
@@ -202,21 +202,21 @@ const AnalyticsDashboard: React.FC = () => {
 
                     {/* Top Courses */}
                     <div className="bg-white rounded-lg shadow-md p-6">
-                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Khóa học phổ biến</h3>
+                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Khóa học phổ biến</h3>
                          <div className="overflow-x-auto">
                               <table className="min-w-full">
                                    <thead>
                                         <tr className="border-b border-gray-200">
-                                             <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider py-2">
+                                             <th className="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2">
                                                   Khóa học
                                              </th>
-                                             <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider py-2">
+                                             <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2">
                                                   Lượt xem
                                              </th>
-                                             <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider py-2">
+                                             <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2">
                                                   Đăng ký
                                              </th>
-                                             <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider py-2">
+                                             <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2">
                                                   Tỷ lệ
                                              </th>
                                         </tr>
@@ -224,7 +224,7 @@ const AnalyticsDashboard: React.FC = () => {
                                    <tbody className="divide-y divide-gray-200">
                                         {topCourses.map((course, index) => (
                                              <tr key={index}>
-                                                  <td className="py-2 text-sm font-medium text-gray-900">{course.name}</td>
+                                                  <td className="py-2 text-sm font-medium text-gray-900 dark:text-gray-100">{course.name}</td>
                                                   <td className="py-2 text-sm text-gray-500 text-right">{course.views}</td>
                                                   <td className="py-2 text-sm text-gray-500 text-right">{course.registrations}</td>
                                                   <td className="py-2 text-sm text-right">
@@ -242,7 +242,7 @@ const AnalyticsDashboard: React.FC = () => {
 
                {/* Real-time Activity */}
                <div className="bg-white rounded-lg shadow-md p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Hoạt động thời gian thực</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Hoạt động thời gian thực</h3>
                     <div className="text-sm text-gray-600">
                          <p>• Người dùng đang online: <span className="font-semibold text-green-600">23</span></p>
                          <p>• Trang được xem nhiều nhất: <span className="font-semibold">Khóa học Toán lớp 10</span></p>

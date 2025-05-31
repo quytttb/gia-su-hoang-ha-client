@@ -2,7 +2,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Course, Registration } from '../types';
-import { getCourseById } from '../services/dataService';
+import coursesService from '../services/firestore/coursesService';
 import { sendRegistrationEmail, sendAutoReplyEmail, initEmailJS } from '../services/emailService';
 import {
   calculateDiscountedPrice,
@@ -17,6 +17,7 @@ import {
   defaultRateLimiter,
   getClientIdentifier,
 } from '../utils/security';
+import { convertFirestoreCourse } from '../utils/courseHelpers';
 import Chatbot from '../components/shared/Chatbot';
 
 const CourseRegistrationPage = () => {
@@ -39,8 +40,10 @@ const CourseRegistrationPage = () => {
 
       try {
         setLoading(true);
-        const courseData = await getCourseById(id);
-        setCourse(courseData);
+        const result = await coursesService.getById(id);
+        if (result.data) {
+          setCourse(convertFirestoreCourse(result.data));
+        }
       } catch (error) {
         console.error('Error fetching course:', error);
       } finally {
@@ -161,8 +164,8 @@ const CourseRegistrationPage = () => {
     return (
       <Layout>
         <div className="container-custom py-20 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Không tìm thấy khóa học</h2>
-          <p className="text-gray-600 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Không tìm thấy khóa học</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
             Khóa học bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
           </p>
           <Link to="/courses" className="btn-primary">
@@ -195,22 +198,22 @@ const CourseRegistrationPage = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Đăng ký thành công!</h2>
-              <p className="text-gray-600">Cảm ơn bạn đã đăng ký khóa học với Gia Sư Hoàng Hà.</p>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Đăng ký thành công!</h2>
+              <p className="text-gray-600 dark:text-gray-400">Cảm ơn bạn đã đăng ký khóa học với Gia Sư Hoàng Hà.</p>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h3 className="font-semibold text-gray-800 mb-2">Thông tin đăng ký:</h3>
-              <p className="text-gray-700 mb-1">
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Thông tin đăng ký:</h3>
+              <p className="text-gray-700 dark:text-gray-200 mb-1">
                 <strong>Khóa học:</strong> {course.name}
               </p>
-              <p className="text-gray-700 mb-1">
+              <p className="text-gray-700 dark:text-gray-200 mb-1">
                 <strong>Mã đăng ký:</strong> {registration.id}
               </p>
-              <p className="text-gray-700 mb-1">
+              <p className="text-gray-700 dark:text-gray-200 mb-1">
                 <strong>Trạng thái:</strong> Chờ xác nhận
               </p>
-              <p className="text-gray-700">
+              <p className="text-gray-700 dark:text-gray-200">
                 <strong>Ngày đăng ký:</strong> {registration.registrationDate}
               </p>
             </div>
@@ -219,7 +222,7 @@ const CourseRegistrationPage = () => {
               <button onClick={() => navigate('/courses')} className="btn-primary w-full">
                 Quay lại trang khóa học
               </button>
-              <p className="mt-4 text-sm text-gray-600">
+              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                 Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để xác nhận đăng ký.
               </p>
             </div>
@@ -238,16 +241,16 @@ const CourseRegistrationPage = () => {
     <Layout>
       <div className="container-custom py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Đăng ký khóa học</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6 text-center">Đăng ký khóa học</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Thông tin học viên</h2>
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Thông tin học viên</h2>
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-4">
-                    <label htmlFor="name" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="name" className="block text-gray-700 dark:text-gray-200 font-medium mb-1">
                       Họ và tên <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -256,16 +259,14 @@ const CourseRegistrationPage = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-                        errors.name ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
                       placeholder="Nhập họ và tên"
                     />
                     {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                   </div>
 
                   <div className="mb-4">
-                    <label htmlFor="phone" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="phone" className="block text-gray-700 dark:text-gray-200 font-medium mb-1">
                       Số điện thoại <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -274,16 +275,14 @@ const CourseRegistrationPage = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-                        errors.phone ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
                       placeholder="Nhập số điện thoại"
                     />
                     {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                   </div>
 
                   <div className="mb-4">
-                    <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="email" className="block text-gray-700 dark:text-gray-200 font-medium mb-1">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -292,9 +291,7 @@ const CourseRegistrationPage = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
                       placeholder="Nhập địa chỉ email"
                     />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -337,7 +334,7 @@ const CourseRegistrationPage = () => {
 
                     {/* Facebook Alternative */}
                     <div className="text-center">
-                      <p className="text-gray-500 text-sm mb-3">Hoặc tư vấn qua:</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">Hoặc tư vấn qua:</p>
                       <button
                         type="button"
                         onClick={() =>
@@ -360,8 +357,8 @@ const CourseRegistrationPage = () => {
             </div>
 
             <div>
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Thông tin khóa học</h3>
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Thông tin khóa học</h3>
 
                 <div className="mb-4">
                   <img
@@ -371,31 +368,33 @@ const CourseRegistrationPage = () => {
                   />
                 </div>
 
-                <h4 className="font-bold text-gray-800 mb-2">{course.name}</h4>
-                <p className="text-gray-600 text-sm mb-4">
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2">{course.name}</h4>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
                   {course.description.substring(0, 100)}...
                 </p>
 
                 <div className="border-t border-gray-200 pt-4 mb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-700">Học phí:</span>
-                    <span className="text-gray-700">{formatCurrency(course.price)}</span>
+                    <span className="text-gray-700 dark:text-gray-200">Học phí:</span>
+                    <span className="text-gray-700 dark:text-gray-200">{formatCurrency(course.price)}</span>
                   </div>
 
                   {hasValidDiscount && (
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-gray-700">Giảm giá:</span>
+                      <span className="text-gray-700 dark:text-gray-200">Giảm giá:</span>
                       <span className="text-green-600">-{course.discount}%</span>
                     </div>
                   )}
 
                   <div className="flex justify-between items-center font-bold">
                     <span>Tổng cộng:</span>
-                    <span className="text-primary">{formatCurrency(finalPrice)}</span>
+                    <span className="text-primary">
+                      {formatCurrency(finalPrice)}
+                    </span>
                   </div>
                 </div>
 
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   <p>* Học phí sẽ được thanh toán tại trung tâm sau khi đăng ký được xác nhận.</p>
                 </div>
               </div>

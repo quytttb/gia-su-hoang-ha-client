@@ -13,7 +13,7 @@
 1. Vào Dashboard → Email Services
 2. Chọn "Add New Service"
 3. Chọn Gmail/Outlook/Yahoo (khuyến nghị Gmail)
-4. Kết nối với email của trung tâm: `lienhe@giasuhoangha.com`
+4. Kết nối với email của trung tâm: `giasuhoangha.tpth@gmail.com`
 5. Lưu Service ID (ví dụ: `service_abc123`)
 
 ### **Bước 3: Tạo Email Templates**

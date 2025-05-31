@@ -21,7 +21,7 @@ const AnalyticsTracker = () => {
                '/courses': 'Khóa Học - Trung Tâm Gia Sư Hoàng Hà',
                '/schedule': 'Lịch Học - Trung Tâm Gia Sư Hoàng Hà',
                '/contact': 'Liên Hệ - Trung Tâm Gia Sư Hoàng Hà',
-               '/admin': 'Quản Trị - Trung Tâm Gia Sư Hoàng Hà',
+               '/panel': 'Panel - Trung Tâm Gia Sư Hoàng Hà',
           };
 
           // Get page title

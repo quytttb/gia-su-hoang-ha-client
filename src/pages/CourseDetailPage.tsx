@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import SectionHeading from '../components/shared/SectionHeading';
 import { Course, Schedule } from '../types';
-import { getCourseById, getSchedulesByCourseId } from '../services/dataService';
+import coursesService from '../services/firestore/coursesService';
+import schedulesService from '../services/firestore/schedulesService';
 import {
   calculateDiscountedPrice,
   formatCurrency,
@@ -11,6 +12,7 @@ import {
   isDiscountValid,
 } from '../utils/helpers';
 import { generateCourseSEO, generateCourseStructuredData } from '../utils/seo';
+import { convertFirestoreCourse } from '../utils/courseHelpers';
 import SEOHead from '../components/shared/SEOHead';
 import Chatbot from '../components/shared/Chatbot';
 
@@ -26,12 +28,14 @@ const CourseDetailPage = () => {
 
       try {
         setLoading(true);
-        const [courseData, schedulesData] = await Promise.all([
-          getCourseById(id),
-          getSchedulesByCourseId(id),
-        ]);
 
-        setCourse(courseData);
+        // Get course from Firestore
+        const courseResult = await coursesService.getById(id);
+        const schedulesData = await schedulesService.getByCourseId(id);
+
+        if (courseResult.data) {
+          setCourse(convertFirestoreCourse(courseResult.data));
+        }
         setSchedules(schedulesData);
       } catch (error) {
         console.error('Error fetching course details:', error);
@@ -85,22 +89,22 @@ const CourseDetailPage = () => {
       )}
 
       {/* Hero Section */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-gray-100 dark:bg-gray-900 py-16">
         <div className="container-custom">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">{course.name}</h1>
-              <p className="text-gray-600 mb-6">{course.description}</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">{course.name}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">{course.description}</p>
 
-              <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <div className="mb-4">
-                  <p className="text-gray-700 mb-1">
+                  <p className="text-gray-700 dark:text-gray-200 mb-1">
                     <strong>Đối tượng:</strong> {course.targetAudience}
                   </p>
-                  <p className="text-gray-700 mb-1">
+                  <p className="text-gray-700 dark:text-gray-200 mb-1">
                     <strong>Lịch học:</strong> {course.schedule}
                   </p>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 dark:text-gray-200">
                     <strong>Thể loại:</strong> {course.category}
                   </p>
                 </div>
@@ -109,22 +113,22 @@ const CourseDetailPage = () => {
                   <div>
                     {hasValidDiscount ? (
                       <div>
-                        <span className="text-gray-500 line-through text-sm block">
+                        <span className="text-gray-500 dark:text-gray-400 line-through text-sm block">
                           {formatCurrency(course.price)}
                         </span>
-                        <span className="text-primary font-bold text-2xl">
+                        <span className="text-primary font-bold text-2xl dark:text-gray-200">
                           {formatCurrency(finalPrice)}
                         </span>
                       </div>
                     ) : (
-                      <span className="text-primary font-bold text-2xl">
+                      <span className="text-primary font-bold text-2xl dark:text-gray-200">
                         {formatCurrency(course.price)}
                       </span>
                     )}
                   </div>
 
                   {hasValidDiscount && (
-                    <div className="bg-primary text-white px-3 py-1 rounded-lg">
+                    <div className="bg-primary text-white px-3 py-1 rounded-lg dark:bg-gray-700">
                       Giảm {course.discount}% đến{' '}
                       {course.discountEndDate && formatDate(course.discountEndDate)}
                     </div>
@@ -133,7 +137,7 @@ const CourseDetailPage = () => {
 
                 <Link
                   to={`/courses/${course.id}/register`}
-                  className="btn-primary w-full block text-center"
+                  className="btn-primary w-full block text-center dark:bg-gray-700 dark:text-gray-200"
                 >
                   Đăng ký ngay
                 </Link>
@@ -157,24 +161,22 @@ const CourseDetailPage = () => {
             />
 
             <div className="overflow-x-auto">
-              <table className="w-full bg-white rounded-lg shadow-md">
-                <thead className="bg-gray-100">
+              <table className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <thead className="bg-gray-100 dark:bg-gray-900">
                   <tr>
-                    <th className="py-3 px-4 text-left">Ngày học</th>
-                    <th className="py-3 px-4 text-left">Thời gian</th>
-                    <th className="py-3 px-4 text-left">Giáo viên</th>
-                    <th className="py-3 px-4 text-left">Phòng</th>
+                    <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Ngày học</th>
+                    <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Thời gian</th>
+                    <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Giáo viên</th>
+                    <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Phòng</th>
                   </tr>
                 </thead>
                 <tbody>
                   {schedules.map(schedule => (
-                    <tr key={schedule.id} className="border-t border-gray-200">
-                      <td className="py-3 px-4">{formatDate(schedule.date)}</td>
-                      <td className="py-3 px-4">
-                        {schedule.startTime} - {schedule.endTime}
-                      </td>
-                      <td className="py-3 px-4">{schedule.tutor}</td>
-                      <td className="py-3 px-4">{schedule.room}</td>
+                    <tr key={schedule.id} className="border-t border-gray-200 dark:border-gray-700">
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{formatDate(schedule.date)}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.startTime} - {schedule.endTime}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.tutor}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.room}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -195,7 +197,7 @@ const CourseDetailPage = () => {
           </p>
           <Link
             to={`/courses/${course.id}/register`}
-            className="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors inline-block"
+            className="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors inline-block dark:bg-gray-700 dark:text-gray-200"
           >
             Đăng ký khóa học
           </Link>

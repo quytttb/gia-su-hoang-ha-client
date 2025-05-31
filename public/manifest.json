@@ -1,0 +1,30 @@
+{
+     "name": "Trung tâm Gia Sư Hoàng Hà",
+     "short_name": "Gia Sư Hoàng Hà",
+     "description": "Trung tâm Gia Sư Hoàng Hà - Dẫn lối tri thức, vững bước tương lai",
+     "theme_color": "#1E40AF",
+     "background_color": "#FFFFFF",
+     "display": "standalone",
+     "orientation": "portrait",
+     "scope": "/",
+     "start_url": "/",
+     "icons": [
+          {
+               "src": "/images/logo.png",
+               "sizes": "192x192",
+               "type": "image/png",
+               "purpose": "any maskable"
+          },
+          {
+               "src": "/images/logo.png",
+               "sizes": "512x512",
+               "type": "image/png",
+               "purpose": "any maskable"
+          }
+     ],
+     "categories": [
+          "education",
+          "business"
+     ],
+     "lang": "vi"
+}

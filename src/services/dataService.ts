@@ -30,8 +30,8 @@ export const getCenterInfo = async (): Promise<CenterInfo> => {
       const response = await api.get('/center-info');
       return response.data;
     } catch (error) {
-      console.error('Error fetching center info:', error);
-      throw error;
+      console.error('Error fetching center info from API, falling back to mock data:', error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
@@ -43,24 +43,27 @@ export const getCenterInfo = async (): Promise<CenterInfo> => {
   });
 };
 
-// Get banners
+// Get banners (active only for public display)
 export const getBanners = async (): Promise<Banner[]> => {
   // TODO: Replace with real API call when backend is ready
   // GET /api/banners
   if (!USE_MOCK_DATA) {
     try {
       const response = await api.get('/banners');
-      return response.data;
+      return response.data.filter((banner: Banner) => banner.isActive);
     } catch (error) {
-      console.error('Error fetching banners:', error);
-      throw error;
+      console.error('Error fetching banners from API, falling back to mock data:', error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
-  // Using mock data
+  // Using mock data - return only active banners
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve(mockData.banners);
+      const activeBanners = mockData.banners
+        .filter(banner => banner.isActive)
+        .sort((a, b) => a.order - b.order);
+      resolve(activeBanners);
     }, 300);
   });
 };
@@ -74,8 +77,8 @@ export const getTutors = async (): Promise<Tutor[]> => {
       const response = await api.get('/tutors');
       return response.data;
     } catch (error) {
-      console.error('Error fetching tutors:', error);
-      throw error;
+      console.error('Error fetching tutors from API, falling back to mock data:', error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
@@ -96,8 +99,8 @@ export const getAllCourses = async (): Promise<Course[]> => {
       const response = await api.get('/courses');
       return response.data;
     } catch (error) {
-      console.error('Error fetching courses:', error);
-      throw error;
+      console.error('Error fetching courses from API, falling back to mock data:', error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
@@ -118,8 +121,8 @@ export const getFeaturedCourses = async (): Promise<Course[]> => {
       const response = await api.get('/courses/featured');
       return response.data;
     } catch (error) {
-      console.error('Error fetching featured courses:', error);
-      throw error;
+      console.error('Error fetching featured courses from API, falling back to mock data:', error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
@@ -141,8 +144,8 @@ export const getCourseById = async (id: string): Promise<Course | undefined> => 
       const response = await api.get(`/courses/${id}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching course with ID ${id}:`, error);
-      throw error;
+      console.error(`Error fetching course with ID ${id} from API, falling back to mock data:`, error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
@@ -164,8 +167,8 @@ export const getCoursesByCategory = async (category: string): Promise<Course[]> 
       const response = await api.get(`/courses/category/${category}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching courses in category ${category}:`, error);
-      throw error;
+      console.error(`Error fetching courses in category ${category} from API, falling back to mock data:`, error);
+      // Fallback to mock data instead of throwing error
     }
   }
 
@@ -187,8 +190,8 @@ export const getAllSchedules = async (): Promise<Schedule[]> => {
       const response = await api.get('/schedules');
       return response.data;
     } catch (error) {
-      console.error('Error fetching schedules:', error);
-      throw error;
+      console.error('Error fetching schedules from API, falling back to mock data:', error);
+      // Fallback to mock data instead of throwing error
     }
   }
 

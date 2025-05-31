@@ -20,7 +20,7 @@
    ```
    VITE_SITE_URL=https://your-domain.vercel.app
    VITE_SITE_NAME=Trung Tâm Gia Sư Hoàng Hà
-   VITE_CONTACT_EMAIL=info@giasuhoangha.com
+   VITE_CONTACT_EMAIL=giasuhoangha.tpth@gmail.com
    VITE_CONTACT_PHONE=0123456789
    ```
 
@@ -60,7 +60,7 @@ Cần setup các biến môi trường sau trong Vercel Dashboard:
 # Required
 VITE_SITE_URL=https://giasuhoangha.com
 VITE_SITE_NAME=Trung Tâm Gia Sư Hoàng Hà
-VITE_CONTACT_EMAIL=info@giasuhoangha.com
+VITE_CONTACT_EMAIL=giasuhoangha.tpth@gmail.com
 VITE_CONTACT_PHONE=0123456789
 
 # Optional

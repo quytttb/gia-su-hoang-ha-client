@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 
@@ -7,11 +8,14 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  const location = useLocation();
+  const isContactPage = location.pathname === '/contact';
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
       <Header />
-      <main className="flex-grow">{children}</main>
-      <Footer />
+      <main className="flex-grow page-transition">{children}</main>
+      <Footer isContactPage={isContactPage} />
     </div>
   );
 };

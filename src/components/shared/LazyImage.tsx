@@ -57,9 +57,8 @@ const LazyImage = ({
         <img
           src={placeholder}
           alt=""
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-            isLoaded ? 'opacity-0' : 'opacity-100'
-          }`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-0' : 'opacity-100'
+            }`}
         />
       )}
 
@@ -68,9 +67,8 @@ const LazyImage = ({
         ref={imgRef}
         src={isInView ? src : placeholder}
         alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         onLoad={handleLoad}
         onError={handleError}
         loading="lazy"
@@ -79,7 +77,7 @@ const LazyImage = ({
       {/* Error state */}
       {hasError && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-          <div className="text-center text-gray-500">
+          <div className="text-center text-gray-500 dark:text-gray-400">
             <svg className="mx-auto h-8 w-8 mb-2" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"

@@ -121,7 +121,7 @@ const parseMarkdown = (text: string) => {
 
       // Add the bold part
       parts.push(
-        <strong key={`bold-${lineIndex}-${match.index}`} className="font-semibold text-gray-900">
+        <strong key={`bold-${lineIndex}-${match.index}`} className="font-semibold text-gray-900 dark:text-gray-100">
           {match[1]}
         </strong>
       );
@@ -341,7 +341,7 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
       <div key={message.id} className="space-y-2">
         <div
           className={`max-w-[85%] p-3 rounded-lg ${isBot
-            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 rounded-br-none border border-blue-100'
+            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 border border-blue-100 dark:border-gray-700'
             : 'bg-gradient-to-r from-primary to-blue-600 text-white rounded-bl-none ml-auto'
             }`}
         >
@@ -357,7 +357,7 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
               <button
                 key={index}
                 onClick={() => handleQuickReply(reply)}
-                className="px-3 py-1.5 text-xs bg-white border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-colors duration-200"
+                className="px-3 py-1.5 text-xs bg-white dark:bg-gray-900 border border-primary text-primary dark:text-primary hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white rounded-full"
               >
                 {reply}
               </button>
@@ -386,7 +386,7 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
   return (
     <div className={`fixed bottom-6 right-6 z-50 ${isChatOpen ? 'w-80 md:w-96' : 'w-16 h-16'}`}>
       {isChatOpen ? (
-        <div className="bg-white rounded-lg shadow-2xl flex flex-col h-[600px] overflow-hidden border border-gray-200">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl flex flex-col h-[600px] overflow-hidden border border-gray-200 dark:border-gray-700">
           {/* Enhanced Chat Header */}
           <div className="bg-gradient-to-r from-primary to-blue-600 text-white p-4 flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -416,10 +416,10 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-800">
             {chatMessages.map(renderMessage)}
             {chatLoading && (
-              <div className="flex space-x-1 p-3 max-w-[85%] bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+              <div className="flex space-x-1 p-3 max-w-[85%] bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-100 dark:border-gray-700">
                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
                 <div
                   className="w-2 h-2 bg-primary rounded-full animate-bounce"
@@ -435,14 +435,14 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
           </div>
 
           {/* Enhanced Chat Input */}
-          <div className="p-4 border-t border-gray-200 bg-white">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <form onSubmit={handleSendMessage} className="flex space-x-2">
               <input
                 type="text"
                 value={userInput}
                 onChange={handleChatInputChange}
                 placeholder="Nhập câu hỏi của bạn..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
               <button
                 type="submit"

@@ -3,8 +3,13 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/images/logo.png" />
+  <link rel="apple-touch-icon" href="/images/logo.png" />
+  <link rel="shortcut icon" href="/images/logo.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1E40AF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1E293B" media="(prefers-color-scheme: dark)" />
 
   <!-- Security Headers -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -28,7 +33,7 @@
   <meta property="og:title" content="Trung tâm Gia Sư Hoàng Hà - Dẫn lối tri thức, vững bước tương lai" />
   <meta property="og:description"
     content="Trung tâm Gia Sư Hoàng Hà cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa. Đội ngũ giáo viên giỏi, phương pháp giảng dạy hiệu quả." />
-  <meta property="og:image" content="https://giasuhoangha.com/og-image.jpg" />
+  <meta property="og:image" content="https://giasuhoangha.com/images/logo-text.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="vi_VN" />
@@ -40,7 +45,7 @@
   <meta property="twitter:title" content="Trung tâm Gia Sư Hoàng Hà - Dẫn lối tri thức, vững bước tương lai" />
   <meta property="twitter:description"
     content="Trung tâm Gia Sư Hoàng Hà cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa. Đội ngũ giáo viên giỏi, phương pháp giảng dạy hiệu quả." />
-  <meta property="twitter:image" content="https://giasuhoangha.com/og-image.jpg" />
+  <meta property="twitter:image" content="https://giasuhoangha.com/images/logo-text.png" />
 
   <!-- Local Business -->
   <meta name="geo.region" content="VN-38" />
@@ -57,8 +62,8 @@
     "alternateName": "Gia Sư Hoàng Hà",
     "description": "Trung tâm Gia Sư Hoàng Hà cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa. Đội ngũ giáo viên giỏi, phương pháp giảng dạy hiệu quả.",
     "url": "https://giasuhoangha.com",
-    "logo": "https://giasuhoangha.com/logo.png",
-    "image": "https://giasuhoangha.com/og-image.jpg",
+    "logo": "https://giasuhoangha.com/images/logo.png",
+    "image": "https://giasuhoangha.com/images/logo-text.png",
     "telephone": "+84385510892",
     "email": "lienhe@giasuhoangha.com",
     "address": {
@@ -98,6 +103,17 @@
 </head>
 
 <body>
+  <!-- Prevent flash of unstyled content -->
+  <script>
+    (function () {
+      const theme = localStorage.getItem('gia-su-theme') || 'system';
+      const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
