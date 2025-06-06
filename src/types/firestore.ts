@@ -7,8 +7,8 @@ export interface FirestoreDocument {
      updatedAt: Timestamp;
 }
 
-// Course interface for Firestore
-export interface FirestoreCourse extends FirestoreDocument {
+// Class interface for Firestore
+export interface FirestoreClass extends FirestoreDocument {
      title: string;
      description: string;
      price: number;
@@ -20,7 +20,6 @@ export interface FirestoreCourse extends FirestoreDocument {
      isActive: boolean;
      instructor?: string;
      maxStudents?: number;
-     currentStudents?: number;
      startDate?: Timestamp;
      endDate?: Timestamp;
      schedule?: {
@@ -29,10 +28,13 @@ export interface FirestoreCourse extends FirestoreDocument {
      }[];
 }
 
+// Alias for backward compatibility
+export type FirestoreCourse = FirestoreClass;
+
 // Registration interface for Firestore
 export interface FirestoreRegistration extends FirestoreDocument {
      userId?: string; // Optional for guest registrations
-     courseId: string;
+     classId: string;
      studentName: string;
      studentPhone: string;
      parentName: string;
@@ -81,7 +83,7 @@ export interface FirestoreInquiry extends FirestoreDocument {
 
 // Schedule interface for Firestore
 export interface FirestoreSchedule extends FirestoreDocument {
-     courseId: string;
+     classId: string;
      instructorId: string;
      instructorName: string;
      date: Timestamp;
@@ -103,7 +105,7 @@ export interface FirestoreSchedule extends FirestoreDocument {
 
 // Analytics interface for Firestore
 export interface FirestoreAnalytics extends FirestoreDocument {
-     type: 'page_view' | 'course_view' | 'registration' | 'inquiry' | 'user_action';
+     type: 'page_view' | 'class_view' | 'registration' | 'inquiry' | 'user_action';
      data: Record<string, any>;
      userId?: string;
      sessionId?: string;
@@ -122,9 +124,9 @@ export interface FirestoreAnalytics extends FirestoreDocument {
 // User statistics interface
 export interface FirestoreUserStats extends FirestoreDocument {
      userId: string;
-     totalCourses: number;
-     completedCourses: number;
-     activeCourses: number;
+     totalClasses: number;
+     completedClasses: number;
+     activeClasses: number;
      totalPayments: number;
      lastActivity: Timestamp;
      achievements?: string[];
@@ -147,7 +149,8 @@ export interface FirestoreSettings extends FirestoreDocument {
 // Collection names constants
 export const COLLECTIONS = {
      USERS: 'users',
-     COURSES: 'courses',
+     CLASSES: 'classes',
+     COURSES: 'courses', // Alias for backward compatibility
      REGISTRATIONS: 'registrations',
      INQUIRIES: 'inquiries',
      SCHEDULES: 'schedules',

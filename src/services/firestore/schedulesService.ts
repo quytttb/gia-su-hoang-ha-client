@@ -26,7 +26,9 @@ export interface FirestoreSchedule {
      endTime: string;
      room: string;
      status: 'scheduled' | 'completed' | 'cancelled';
-     studentPhone?: string;
+     maxStudents?: number;
+     studentPhones?: string[];
+     tutor?: string;
      notes?: string;
      createdAt: Timestamp;
      updatedAt: Timestamp;
@@ -36,14 +38,15 @@ export interface FirestoreSchedule {
 const convertFromFirestore = (firestoreSchedule: FirestoreSchedule): Schedule => {
      return {
           id: firestoreSchedule.id,
-          courseId: firestoreSchedule.courseId,
-          courseName: '', // Will be populated by joining with course data
+          classId: firestoreSchedule.courseId,
+          className: '', // Will be populated by joining with course data
           date: firestoreSchedule.date,
           startTime: firestoreSchedule.startTime,
           endTime: firestoreSchedule.endTime,
-          tutor: '', // Will be populated by joining with tutor data
+          tutor: firestoreSchedule.tutor || '', // Use stored tutor name or empty
           room: firestoreSchedule.room,
-          studentIds: [], // Will be populated from registrations
+          maxStudents: firestoreSchedule.maxStudents,
+          studentPhones: firestoreSchedule.studentPhones || [],
      };
 };
 
@@ -153,7 +156,7 @@ class SchedulesService {
                });
           } catch (error) {
                console.error('Error fetching schedules by course:', error);
-               throw new Error('Không thể tải lịch học theo khóa học');
+               throw new Error('Không thể tải lịch học theo lớp học');
           }
      }
 
@@ -166,7 +169,7 @@ class SchedulesService {
 
                const q = query(
                     collection(db as Firestore, COLLECTION_NAME),
-                    where('studentPhone', '==', phone)
+                    where('studentPhones', 'array-contains', phone)
                );
                const querySnapshot = await getDocs(q);
 

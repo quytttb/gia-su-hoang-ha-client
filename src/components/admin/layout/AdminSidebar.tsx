@@ -39,8 +39,13 @@ const sidebarItems: SidebarItem[] = [
           icon: Image,
      },
      {
-          title: 'Khóa học',
-          href: '/panel/courses',
+          title: 'Giáo viên',
+          href: '/panel/tutors',
+          icon: Users,
+     },
+     {
+          title: 'Lớp học',
+          href: '/panel/classes',
           icon: BookOpen,
      },
      {

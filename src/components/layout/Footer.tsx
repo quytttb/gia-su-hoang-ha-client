@@ -30,8 +30,13 @@ const Footer = ({ isContactPage = false }: FooterProps) => {
                 </Link>
               </li>
               <li>
-                <Link to="/courses" className="text-gray-300 hover:text-primary transition-colors">
+                <Link to="/classes" className="text-gray-300 hover:text-primary transition-colors">
                   Khóa học
+                </Link>
+              </li>
+              <li>
+                <Link to="/tutor-search" className="text-gray-300 hover:text-primary transition-colors">
+                  Tìm gia sư
                 </Link>
               </li>
               <li>

@@ -225,7 +225,7 @@ const SchedulePage = () => {
                     <table className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
                       <thead className="bg-gray-100">
                         <tr>
-                          <th className="py-3 px-4 text-left">Khóa học</th>
+                          <th className="py-3 px-4 text-left">Lớp học</th>
                           <th className="py-3 px-4 text-left">Thời gian</th>
                           <th className="py-3 px-4 text-left">Giáo viên</th>
                           <th className="py-3 px-4 text-left">Phòng</th>
@@ -234,7 +234,7 @@ const SchedulePage = () => {
                       <tbody>
                         {filteredSchedules.map(schedule => (
                           <tr key={schedule.id} className="border-t border-gray-200 dark:border-gray-700">
-                            <td className="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">{schedule.courseName}</td>
+                            <td className="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">{schedule.className}</td>
                             <td className="py-3 px-4 text-gray-800 dark:text-gray-200">
                               {schedule.startTime} - {schedule.endTime}
                             </td>
@@ -274,7 +274,7 @@ const SchedulePage = () => {
                       <div className="space-y-4">
                         {filteredSchedules.map(schedule => (
                           <div key={schedule.id} className="border-l-4 border-primary pl-4 py-2">
-                            <p className="font-medium text-gray-800 dark:text-gray-200">{schedule.courseName}</p>
+                            <p className="font-medium text-gray-800 dark:text-gray-200">{schedule.className}</p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                               {schedule.startTime} - {schedule.endTime} | {schedule.tutor} | Phòng:{' '}
                               {schedule.room}
@@ -343,7 +343,7 @@ const SchedulePage = () => {
                         key={schedule.id}
                         className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0"
                       >
-                        <p className="font-medium text-gray-800 dark:text-gray-200">{schedule.courseName}</p>
+                        <p className="font-medium text-gray-800 dark:text-gray-200">{schedule.className}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Ngày: {formatDate(schedule.date)}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Giờ: {schedule.startTime} - {schedule.endTime}

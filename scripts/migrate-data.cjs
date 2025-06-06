@@ -42,7 +42,6 @@ const mockCourses = [
           isActive: true,
           instructor: "Thầy Nguyễn Văn A",
           maxStudents: 20,
-          currentStudents: 12
      },
      {
           title: "Vật lý lớp 11",
@@ -56,7 +55,6 @@ const mockCourses = [
           isActive: true,
           instructor: "Cô Trần Thị B",
           maxStudents: 15,
-          currentStudents: 8
      },
      {
           title: "Hóa học lớp 12",
@@ -70,7 +68,6 @@ const mockCourses = [
           isActive: true,
           instructor: "Thầy Lê Văn C",
           maxStudents: 25,
-          currentStudents: 18
      }
 ];
 

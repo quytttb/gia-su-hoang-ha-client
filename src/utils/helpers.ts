@@ -1,9 +1,8 @@
-// Format currency to VND
+// Format currency to VND with Vietnamese number format (dots as thousand separators)
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(amount);
+  // Format number with dot as thousand separator
+  const formattedNumber = new Intl.NumberFormat('de-DE').format(amount);
+  return `${formattedNumber} đ/buổi`;
 };
 
 // Format date to Vietnamese format
@@ -33,6 +32,11 @@ export const isDiscountValid = (discountEndDate?: string): boolean => {
   const now = new Date();
   const endDate = new Date(discountEndDate);
   return now <= endDate;
+};
+
+// Check if a discount is valid and has value
+export const hasValidDiscount = (discount?: number, discountEndDate?: string): boolean => {
+  return !!(discount && discount > 0 && isDiscountValid(discountEndDate));
 };
 
 // Format phone number with spaces

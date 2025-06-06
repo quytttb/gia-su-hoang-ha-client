@@ -1,11 +1,11 @@
 import { serverTimestamp } from 'firebase/firestore';
 import { BaseFirestoreService, QueryOptions, ServiceResponse, PaginatedResponse } from './base';
 import { FirestoreRegistration, COLLECTIONS } from '../../types/firestore';
-import coursesService from './coursesService';
+import coursesService from './classesService';
 
 export interface RegistrationFilters {
      status?: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
-     courseId?: string;
+     classId?: string;
      userId?: string;
      paymentStatus?: 'pending' | 'partial' | 'completed' | 'refunded';
      dateRange?: { start: Date; end: Date };
@@ -18,7 +18,7 @@ export interface RegistrationStats {
      rejectedRegistrations: number;
      totalRevenue: number;
      pendingPayments: number;
-     popularCourses: { courseId: string; courseName?: string; count: number }[];
+     popularCourses: { classId: string; className?: string; count: number }[];
      recentRegistrations: number;
 }
 
@@ -33,7 +33,7 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
      ): Promise<ServiceResponse<FirestoreRegistration>> {
           try {
                // Check if course exists and has available spots
-               const courseResult = await coursesService.getById(registrationData.courseId);
+               const courseResult = await coursesService.getById(registrationData.classId);
                if (!courseResult.data) {
                     return {
                          data: null,
@@ -51,14 +51,7 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
                     };
                }
 
-               // Check available spots
-               if (course.maxStudents && course.currentStudents && course.currentStudents >= course.maxStudents) {
-                    return {
-                         data: null,
-                         error: 'Khóa học đã đầy',
-                         loading: false,
-                    };
-               }
+               // Available spots check removed as currentStudents is no longer tracked
 
                // Create registration with default values
                const registration = {
@@ -71,10 +64,7 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
 
                const result = await this.create(registration);
 
-               // Update course enrollment count if registration was successful
-               if (result.data) {
-                    await coursesService.updateEnrollmentCount(registrationData.courseId, 1);
-               }
+               // Enrollment count tracking removed
 
                return result;
           } catch (error: any) {
@@ -100,8 +90,8 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
                     whereClause.push({ field: 'status', operator: '==', value: filters.status });
                }
 
-               if (filters?.courseId) {
-                    whereClause.push({ field: 'courseId', operator: '==', value: filters.courseId });
+               if (filters?.classId) {
+                    whereClause.push({ field: 'classId', operator: '==', value: filters.classId });
                }
 
                if (filters?.userId) {
@@ -173,30 +163,13 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
           rejectedBy: string
      ): Promise<ServiceResponse<FirestoreRegistration>> {
           try {
-               // Get registration to update course enrollment count
-               const registrationResult = await this.getById(registrationId);
-               if (!registrationResult.data) {
-                    return {
-                         data: null,
-                         error: 'Registration not found',
-                         loading: false,
-                    };
-               }
-
                const updateData = {
                     status: 'rejected' as const,
                     rejectionReason,
                     approvedBy: rejectedBy, // Using approvedBy field for tracking who processed it
                };
 
-               const result = await this.update(registrationId, updateData);
-
-               // Decrease course enrollment count if rejection was successful
-               if (result.data && registrationResult.data.status === 'approved') {
-                    await coursesService.updateEnrollmentCount(registrationResult.data.courseId, -1);
-               }
-
-               return result;
+               return await this.update(registrationId, updateData);
           } catch (error: any) {
                console.error('Error rejecting registration:', error);
                return {
@@ -210,28 +183,11 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
      // Cancel registration
      async cancelRegistration(registrationId: string): Promise<ServiceResponse<FirestoreRegistration>> {
           try {
-               // Get registration to update course enrollment count
-               const registrationResult = await this.getById(registrationId);
-               if (!registrationResult.data) {
-                    return {
-                         data: null,
-                         error: 'Registration not found',
-                         loading: false,
-                    };
-               }
-
                const updateData = {
                     status: 'cancelled' as const,
                };
 
-               const result = await this.update(registrationId, updateData);
-
-               // Decrease course enrollment count if cancellation was successful
-               if (result.data && registrationResult.data.status === 'approved') {
-                    await coursesService.updateEnrollmentCount(registrationResult.data.courseId, -1);
-               }
-
-               return result;
+               return await this.update(registrationId, updateData);
           } catch (error: any) {
                console.error('Error cancelling registration:', error);
                return {
@@ -313,7 +269,7 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
           courseId: string,
           options?: QueryOptions
      ): Promise<PaginatedResponse<FirestoreRegistration>> {
-          return this.getRegistrations({ courseId }, options);
+          return this.getRegistrations({ classId: courseId }, options);
      }
 
      // Get registration statistics
@@ -345,11 +301,11 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
                // Popular courses
                const courseCount: { [key: string]: number } = {};
                registrations.forEach(registration => {
-                    courseCount[registration.courseId] = (courseCount[registration.courseId] || 0) + 1;
+                    courseCount[registration.classId] = (courseCount[registration.classId] || 0) + 1;
                });
 
                const popularCourses = Object.entries(courseCount)
-                    .map(([courseId, count]) => ({ courseId, count }))
+                    .map(([classId, count]) => ({ classId, count }))
                     .sort((a, b) => b.count - a.count)
                     .slice(0, 5);
 

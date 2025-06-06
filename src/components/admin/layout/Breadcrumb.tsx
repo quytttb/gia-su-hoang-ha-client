@@ -15,7 +15,7 @@ interface BreadcrumbProps {
 
 const routeLabels: Record<string, string> = {
      '/panel': 'Tổng quan',
-     '/panel/courses': 'Khóa học',
+     '/panel/classes': 'Lớp học',
      '/panel/schedules': 'Lịch học',
      '/panel/registrations': 'Đăng ký',
      '/panel/inquiries': 'Tin nhắn',

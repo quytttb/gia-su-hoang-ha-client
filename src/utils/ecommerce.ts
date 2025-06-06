@@ -1,7 +1,7 @@
 // Enhanced Ecommerce Events for GA4
 
 // Enhanced Ecommerce Events for GA4
-export interface CourseItem {
+export interface ClassItem {
      item_id: string;
      item_name: string;
      item_category: string;
@@ -14,12 +14,12 @@ export interface PurchaseData {
      transaction_id: string;
      value: number;
      currency: string;
-     items: CourseItem[];
+     items: ClassItem[];
      coupon?: string;
 }
 
-// Track course view (Enhanced Ecommerce)
-export const trackCourseViewEcommerce = (course: {
+// Track class view (Enhanced Ecommerce)
+export const trackClassViewEcommerce = (classData: {
      id: string;
      name: string;
      price: number;
@@ -29,13 +29,13 @@ export const trackCourseViewEcommerce = (course: {
 
      window.gtag('event', 'view_item', {
           currency: 'VND',
-          value: course.price,
+          value: classData.price,
           items: [
                {
-                    item_id: course.id,
-                    item_name: course.name,
-                    item_category: course.category || 'Khóa học',
-                    price: course.price,
+                    item_id: classData.id,
+                    item_name: classData.name,
+                    item_category: classData.category || 'Lớp học',
+                    price: classData.price,
                     quantity: 1,
                },
           ],
@@ -43,7 +43,7 @@ export const trackCourseViewEcommerce = (course: {
 };
 
 // Track add to cart (when user clicks register)
-export const trackAddToCart = (course: {
+export const trackAddToCart = (classData: {
      id: string;
      name: string;
      price: number;
@@ -53,21 +53,21 @@ export const trackAddToCart = (course: {
 
      window.gtag('event', 'add_to_cart', {
           currency: 'VND',
-          value: course.price,
+          value: classData.price,
           items: [
                {
-                    item_id: course.id,
-                    item_name: course.name,
-                    item_category: course.category || 'Khóa học',
-                    price: course.price,
+                    item_id: classData.id,
+                    item_name: classData.name,
+                    item_category: classData.category || 'Lớp học',
+                    price: classData.price,
                     quantity: 1,
                },
           ],
      });
 };
 
-// Track course registration start
-export const trackBeginCheckout = (course: {
+// Track class registration start
+export const trackBeginCheckout = (classData: {
      id: string;
      name: string;
      price: number;
@@ -77,20 +77,20 @@ export const trackBeginCheckout = (course: {
 
      window.gtag('event', 'begin_checkout', {
           currency: 'VND',
-          value: course.price,
+          value: classData.price,
           items: [
                {
-                    item_id: course.id,
-                    item_name: course.name,
-                    item_category: course.category || 'Khóa học',
-                    price: course.price,
+                    item_id: classData.id,
+                    item_name: classData.name,
+                    item_category: classData.category || 'Lớp học',
+                    price: classData.price,
                     quantity: 1,
                },
           ],
      });
 };
 
-// Track successful course registration
+// Track successful class registration
 export const trackPurchase = (purchaseData: PurchaseData) => {
      if (!window.gtag) return;
 
@@ -103,7 +103,7 @@ export const trackPurchase = (purchaseData: PurchaseData) => {
      });
 };
 
-// Track course search
+// Track class search
 export const trackSearch = (searchTerm: string, results?: number) => {
      if (!window.gtag) return;
 
@@ -113,17 +113,17 @@ export const trackSearch = (searchTerm: string, results?: number) => {
      });
 };
 
-// Track course list view
-export const trackViewItemList = (listName: string, courses: CourseItem[]) => {
+// Track class list view
+export const trackViewItemList = (listName: string, classes: ClassItem[]) => {
      if (!window.gtag) return;
 
      window.gtag('event', 'view_item_list', {
           item_list_name: listName,
-          items: courses,
+          items: classes,
      });
 };
 
-// Track course promotion view
+// Track class promotion view
 export const trackViewPromotion = (promotionId: string, promotionName: string) => {
      if (!window.gtag) return;
 
@@ -133,13 +133,13 @@ export const trackViewPromotion = (promotionId: string, promotionName: string) =
      });
 };
 
-// Track course share
-export const trackShare = (courseId: string, method: string) => {
+// Track class share
+export const trackShare = (classId: string, method: string) => {
      if (!window.gtag) return;
 
      window.gtag('event', 'share', {
           method: method,
-          content_type: 'course',
-          content_id: courseId,
+          content_type: 'class',
+          content_id: classId,
      });
 }; 

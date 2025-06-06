@@ -135,7 +135,7 @@ export const sendAutoReplyEmail = async (
       center_name: 'Trung tâm Gia Sư Hoàng Hà',
       center_phone: '0385.510.892 - 0962.390.161',
       center_address: '265 - Đường 06 - Mặt Bằng 08, Phường Nam Ngạn, Thanh Hóa',
-      message_type: isRegistration ? 'đăng ký khóa học' : 'liên hệ',
+      message_type: isRegistration ? 'đăng ký lớp học' : 'liên hệ',
       reply_to: 'giasuhoangha.tpth@gmail.com',
     };
 

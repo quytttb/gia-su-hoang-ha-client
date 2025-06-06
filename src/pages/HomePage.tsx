@@ -3,20 +3,20 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import Banner from '../components/shared/Banner';
 import SectionHeading from '../components/shared/SectionHeading';
-import CourseCard from '../components/shared/CourseCard';
-import { Banner as BannerType, CenterInfo, Course } from '../types';
+import ClassCard from '../components/shared/ClassCard';
+import { Banner as BannerType, CenterInfo, Class } from '../types';
 import { bannerService } from '../services/bannerService';
-import coursesService from '../services/firestore/coursesService';
+import classesService from '../services/firestore/classesService';
 import settingsService from '../services/firestore/settingsService';
 import { updateSEO, seoData } from '../utils/seo';
-import { convertFirestoreCourse, getFeaturedCourses } from '../utils/courseHelpers';
+import { convertFirestoreClass, getFeaturedClasses } from '../utils/classHelpers';
 import Chatbot from '../components/shared/Chatbot';
 import ErrorDisplay from '../components/shared/ErrorDisplay';
 
 const HomePage = () => {
   const [banners, setBanners] = useState<BannerType[]>([]);
   const [centerInfo, setCenterInfo] = useState<CenterInfo | null>(null);
-  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
+  const [featuredClasses, setFeaturedClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,15 +47,15 @@ const HomePage = () => {
 
     fetchData();
 
-    // Set up real-time listener for featured courses
-    const unsubscribe = coursesService.subscribeToActiveCourses((firestoreCourses) => {
+    // Set up real-time listener for featured classes
+    const unsubscribe = classesService.subscribeToActiveClasses((firestoreClasses) => {
       try {
-        const coursesData = firestoreCourses.map(convertFirestoreCourse);
-        const featuredOnly = getFeaturedCourses(coursesData, 6); // Limit to 6 featured courses
-        setFeaturedCourses(featuredOnly);
+        const classesData = firestoreClasses.map(convertFirestoreClass);
+        const featuredOnly = getFeaturedClasses(classesData, 6); // Limit to 6 featured classes
+        setFeaturedClasses(featuredOnly);
       } catch (error: any) {
-        console.error('Error processing courses:', error);
-        setError(error.message || 'Không thể xử lý danh sách khóa học');
+        console.error('Error processing classes:', error);
+        setError(error.message || 'Không thể xử lý danh sách lớp học');
       }
     });
 
@@ -116,29 +116,29 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* Featured Courses Section */}
+      {/* Featured Classes Section */}
       <section className="section-padding bg-white dark:bg-gray-800">
         <div className="container-custom">
           <SectionHeading
-            title="Khóa Học Nổi Bật"
-            subtitle="Các khóa học được nhiều học viên lựa chọn và đánh giá cao"
+            title="Lớp Học Nổi Bật"
+            subtitle="Các lớp học được nhiều học viên lựa chọn và đánh giá cao"
           />
 
-          {featuredCourses.length > 0 ? (
+          {featuredClasses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredCourses.map(course => (
-                <CourseCard key={course.id} course={course} />
+              {featuredClasses.map(classData => (
+                <ClassCard key={classData.id} class={classData} />
               ))}
             </div>
           ) : (
             <div className="text-center py-10">
-              <p className="text-gray-500 text-lg">Chưa có khóa học nào được đăng.</p>
+              <p className="text-gray-500 text-lg">Chưa có lớp học nào được đăng.</p>
             </div>
           )}
 
           <div className="mt-12 text-center">
-            <Link to="/courses" className="btn-primary">
-              Xem tất cả khóa học
+            <Link to="/classes" className="btn-primary">
+              Xem tất cả lớp học
             </Link>
           </div>
         </div>
@@ -147,9 +147,9 @@ const HomePage = () => {
       {/* Contact CTA Section */}
       <section className="section-padding bg-primary text-white dark:bg-primary-700">
         <div className="container-custom text-center">
-          <h2 className="text-3xl font-bold mb-4">Bạn cần tư vấn về khóa học?</h2>
+          <h2 className="text-3xl font-bold mb-4">Bạn cần tư vấn về lớp học?</h2>
           <p className="mb-8 max-w-2xl mx-auto text-white dark:text-gray-200">
-            Hãy liên hệ với chúng tôi ngay hôm nay để được tư vấn miễn phí về các khóa học phù hợp
+            Hãy liên hệ với chúng tôi ngay hôm nay để được tư vấn miễn phí về các lớp học phù hợp
             nhất với nhu cầu của bạn hoặc con em của bạn.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -160,10 +160,10 @@ const HomePage = () => {
               Liên hệ ngay
             </Link>
             <Link
-              to="/courses"
+              to="/classes"
               className="border border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-primary dark:hover:bg-gray-900 dark:hover:text-white transition-colors"
             >
-              Xem khóa học
+              Xem lớp học
             </Link>
           </div>
         </div>

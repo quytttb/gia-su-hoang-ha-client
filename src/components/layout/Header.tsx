@@ -10,7 +10,8 @@ const Header = () => {
   const navigation = [
     { name: 'Trang chủ', href: '/' },
     { name: 'Về chúng tôi', href: '/about' },
-    { name: 'Khóa học', href: '/courses' },
+    { name: 'Lớp học', href: '/classes' },
+    { name: 'Tìm gia sư', href: '/tutor-search' },
     { name: 'Lịch học', href: '/schedule' },
     { name: 'Liên hệ', href: '/contact' },
   ];

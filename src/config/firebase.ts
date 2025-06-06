@@ -40,9 +40,9 @@ try {
           try {
                analytics = getAnalytics(app);
                console.log('Firebase Analytics initialized');
-          } catch (analyticsError) {
-               console.warn('Firebase Analytics initialization skipped');
-               analytics = null;
+          } catch {
+               // Analytics may not be available in some environments (e.g., localhost)
+               console.warn('Firebase Analytics not available');
           }
      } else {
           console.log('Firebase Analytics initialized (data collection disabled)');

@@ -1,206 +1,121 @@
-import { mockData } from './mockData';
-import { Banner, CenterInfo, Course, Inquiry, Registration, Schedule, Tutor, User } from '../types';
-import { generateId } from '../utils/helpers';
-import axios from 'axios';
+import { Banner, CenterInfo, Class, Inquiry, Registration, Schedule, Tutor } from '../types';
 
-// Base URL for API calls
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.PROD ? 'https://api.giasuhoangha.com/api' : '/api');
+// Create axios instance for API calls
+// import axios from 'axios';
+// const api = axios.create({
+//   baseURL: API_BASE_URL,
+//   timeout: 10000,
+// });
 
-// Create axios instance
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000, // 10 second timeout
-});
-
-// Function to determine whether to use mock data or real API
-const USE_MOCK_DATA =
-  import.meta.env.VITE_USE_MOCK_DATA === 'true' || import.meta.env.VITE_USE_MOCK_DATA === undefined;
-
-// Get center information
-export const getCenterInfo = async (): Promise<CenterInfo> => {
-  // TODO: Replace with real API call when backend is ready
-  // GET /api/center-info
-  if (!USE_MOCK_DATA) {
-    try {
-      const response = await api.get('/center-info');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching center info from API, falling back to mock data:', error);
-      // Fallback to mock data instead of throwing error
-    }
-  }
-
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(mockData.centerInfo);
-    }, 300);
-  });
-};
-
-// Get banners (active only for public display)
-export const getBanners = async (): Promise<Banner[]> => {
-  // TODO: Replace with real API call when backend is ready
-  // GET /api/banners
-  if (!USE_MOCK_DATA) {
-    try {
-      const response = await api.get('/banners');
-      return response.data.filter((banner: Banner) => banner.isActive);
-    } catch (error) {
-      console.error('Error fetching banners from API, falling back to mock data:', error);
-      // Fallback to mock data instead of throwing error
-    }
-  }
-
-  // Using mock data - return only active banners
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const activeBanners = mockData.banners
-        .filter(banner => banner.isActive)
-        .sort((a, b) => a.order - b.order);
-      resolve(activeBanners);
-    }, 300);
-  });
-};
-
-// Get tutors
-export const getTutors = async (): Promise<Tutor[]> => {
-  // TODO: Replace with real API call when backend is ready
-  // GET /api/tutors
-  if (!USE_MOCK_DATA) {
-    try {
-      const response = await api.get('/tutors');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching tutors from API, falling back to mock data:', error);
-      // Fallback to mock data instead of throwing error
-    }
-  }
-
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(mockData.tutors);
-    }, 300);
-  });
-};
+// Whether to use mock data for development
+const USE_MOCK_DATA = true;
 
 // Get all courses
-export const getAllCourses = async (): Promise<Course[]> => {
+export const getCourses = async (): Promise<Class[]> => {
   // TODO: Replace with real API call when backend is ready
-  // GET /api/courses
+  // GET /api/classes
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get('/courses');
-      return response.data;
+      // const response = await api.get('/classes');
+      // return response.data;
     } catch (error) {
-      console.error('Error fetching courses from API, falling back to mock data:', error);
-      // Fallback to mock data instead of throwing error
+      console.error('Error fetching courses from API:', error);
+      throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(mockData.courses);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
+};
+
+// Get a single course by ID
+export const getCourseById = async (id: string): Promise<Class | undefined> => {
+  // TODO: Replace with real API call when backend is ready
+  // GET /api/classes/:id
+  if (!USE_MOCK_DATA) {
+    try {
+      // const response = await api.get(`/classes/${id}`);
+      // return response.data;
+    } catch (error) {
+      console.error(`Error fetching course ${id} from API:`, error);
+      throw error;
+    }
+  }
+
+  // Return undefined since mockData is removed
+  return undefined;
 };
 
 // Get featured courses
-export const getFeaturedCourses = async (): Promise<Course[]> => {
+export const getFeaturedCourses = async (): Promise<Class[]> => {
   // TODO: Replace with real API call when backend is ready
-  // GET /api/courses/featured
+  // GET /api/classes/featured
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get('/courses/featured');
-      return response.data;
+      // const response = await api.get('/classes/featured');
+      // return response.data;
     } catch (error) {
-      console.error('Error fetching featured courses from API, falling back to mock data:', error);
-      // Fallback to mock data instead of throwing error
+      console.error('Error fetching featured courses from API:', error);
+      throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const featured = mockData.courses.filter(course => course.featured);
-      resolve(featured);
-    }, 300);
-  });
-};
-
-// Get course by ID
-export const getCourseById = async (id: string): Promise<Course | undefined> => {
-  // TODO: Replace with real API call when backend is ready
-  // GET /api/courses/:id
-  if (!USE_MOCK_DATA) {
-    try {
-      const response = await api.get(`/courses/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching course with ID ${id} from API, falling back to mock data:`, error);
-      // Fallback to mock data instead of throwing error
-    }
-  }
-
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const course = mockData.courses.find(course => course.id === id);
-      resolve(course);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
 };
 
 // Get courses by category
-export const getCoursesByCategory = async (category: string): Promise<Course[]> => {
+export const getCoursesByCategory = async (category: string): Promise<Class[]> => {
   // TODO: Replace with real API call when backend is ready
-  // GET /api/courses/category/:category
+  // GET /api/classes/category/:category
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get(`/courses/category/${category}`);
-      return response.data;
+      // const response = await api.get(`/classes/category/${category}`);
+      // return response.data;
     } catch (error) {
-      console.error(`Error fetching courses in category ${category} from API, falling back to mock data:`, error);
-      // Fallback to mock data instead of throwing error
+      console.error(`Error fetching courses in category ${category} from API:`, error);
+      throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const filtered = mockData.courses.filter(course => course.category === category);
-      resolve(filtered);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
 };
 
 // Get all schedules
-export const getAllSchedules = async (): Promise<Schedule[]> => {
+export const getSchedules = async (): Promise<Schedule[]> => {
   // TODO: Replace with real API call when backend is ready
   // GET /api/schedules
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get('/schedules');
-      return response.data;
+      // const response = await api.get('/schedules');
+      // return response.data;
     } catch (error) {
-      console.error('Error fetching schedules from API, falling back to mock data:', error);
-      // Fallback to mock data instead of throwing error
+      console.error('Error fetching schedules from API:', error);
+      throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(mockData.schedules);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
+};
+
+// Get available schedule dates
+export const getAvailableScheduleDates = async (): Promise<string[]> => {
+  // TODO: Replace with real API call when backend is ready
+  // GET /api/schedules/dates
+  if (!USE_MOCK_DATA) {
+    try {
+      // const response = await api.get('/schedules/dates');
+      // return response.data;
+    } catch (error) {
+      console.error('Error fetching available schedule dates from API:', error);
+      throw error;
+    }
+  }
+
+  // Return empty array since mockData is removed
+  return [];
 };
 
 // Get schedules by date
@@ -209,21 +124,16 @@ export const getSchedulesByDate = async (date: string): Promise<Schedule[]> => {
   // GET /api/schedules/date/:date
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get(`/schedules/date/${date}`);
-      return response.data;
+      // const response = await api.get(`/schedules/date/${date}`);
+      // return response.data;
     } catch (error) {
-      console.error(`Error fetching schedules for date ${date}:`, error);
+      console.error(`Error fetching schedules for date ${date} from API:`, error);
       throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const filtered = mockData.schedules.filter(schedule => schedule.date === date);
-      resolve(filtered);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
 };
 
 // Get schedules by course ID
@@ -232,193 +142,138 @@ export const getSchedulesByCourseId = async (courseId: string): Promise<Schedule
   // GET /api/schedules/course/:courseId
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get(`/schedules/course/${courseId}`);
-      return response.data;
+      // const response = await api.get(`/schedules/course/${courseId}`);
+      // return response.data;
     } catch (error) {
       console.error(`Error fetching schedules for course ${courseId}:`, error);
       throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const filtered = mockData.schedules.filter(schedule => schedule.courseId === courseId);
-      resolve(filtered);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
 };
 
 // Get schedules by user phone
 export const getSchedulesByUserPhone = async (phone: string): Promise<Schedule[]> => {
   // TODO: Replace with real API call when backend is ready
-  // GET /api/schedules/phone/:phone
+  // GET /api/schedules/user/:phone
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.get(`/schedules/phone/${phone}`);
-      return response.data;
+      // const response = await api.get(`/schedules/user/${phone}`);
+      // return response.data;
     } catch (error) {
-      console.error(`Error fetching schedules for phone ${phone}:`, error);
+      console.error(`Error fetching schedules for user ${phone} from API:`, error);
       throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      // Find the user by phone
-      const user = mockData.users.find(user => user.phone === phone);
-
-      if (!user || !user.registrations) {
-        resolve([]);
-        return;
-      }
-
-      // Get course IDs the user is registered for
-      const courseIds = user.registrations.map(reg => reg.courseId);
-
-      // Filter schedules by those course IDs
-      const filtered = mockData.schedules.filter(
-        schedule => courseIds.includes(schedule.courseId) && schedule.studentIds.includes(user.id)
-      );
-
-      resolve(filtered);
-    }, 300);
-  });
+  // Return empty array since mockData is removed
+  return [];
 };
 
-// Register for a course
-export const registerForCourse = async (
-  name: string,
-  phone: string,
-  email: string,
-  courseId: string
-): Promise<Registration> => {
+// Get all tutors
+export const getTutors = async (): Promise<Tutor[]> => {
   // TODO: Replace with real API call when backend is ready
-  // POST /api/register
+  // GET /api/tutors
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.post('/register', {
-        name,
-        phone,
-        email,
-        courseId,
-      });
-      return response.data;
+      // const response = await api.get('/tutors');
+      // return response.data;
     } catch (error) {
-      console.error('Error registering for course:', error);
+      console.error('Error fetching tutors from API:', error);
       throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      // In a real app, this would be a server-side operation
-      // Here we're simulating it with local data
-
-      // Check if user exists, otherwise create new
-      let user = mockData.users.find(user => user.phone === phone);
-      let userId = user?.id || '';
-
-      if (!user) {
-        userId = `user${generateId()}`;
-        const newUser: User = {
-          id: userId,
-          name,
-          phone,
-          email,
-          registrations: [],
-        };
-
-        mockData.users.push(newUser);
-        user = newUser;
-      }
-
-      // Create registration
-      const registration: Registration = {
-        id: `reg${generateId()}`,
-        userId,
-        courseId,
-        registrationDate: new Date().toISOString().split('T')[0],
-        status: 'pending',
-        paymentStatus: 'pending',
-      };
-
-      // Add to user's registrations
-      if (user.registrations) {
-        user.registrations.push(registration);
-      } else {
-        user.registrations = [registration];
-      }
-
-      resolve(registration);
-    }, 600);
-  });
+  // Return empty array since mockData is removed
+  return [];
 };
 
-// Submit inquiry
-export const submitInquiry = async (
-  name: string,
-  phone: string,
-  email: string,
-  message: string
-): Promise<Inquiry> => {
+// Get center information
+export const getCenterInfo = async (): Promise<CenterInfo> => {
   // TODO: Replace with real API call when backend is ready
-  // POST /api/inquiry
+  // GET /api/center-info
   if (!USE_MOCK_DATA) {
     try {
-      const response = await api.post('/inquiry', {
-        name,
-        phone,
-        email,
-        message,
-      });
-      return response.data;
+      // const response = await api.get('/center-info');
+      // return response.data;
     } catch (error) {
-      console.error('Error submitting inquiry:', error);
+      console.error('Error fetching center info from API:', error);
+      throw error;
+    }
+    throw new Error('Center info not available');
+  }
+
+  // Return default center info since mockData is removed
+  return {
+    id: '1',
+    name: 'Trung tâm Gia Sư Hoàng Hà',
+    description: 'Trung tâm Gia Sư Hoàng Hà tự hào là nơi cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa.',
+    address: '265 - ĐƯỜNG 06 - MẶT BẰNG 08, PHƯỜNG NAM NGẠN, THÀNH PHỐ THANH HOÁ, TỈNH THANH HOÁ',
+    phone: '0385.510.892 - 0962.390.161',
+    email: 'lienhe@giasuhoangha.com',
+    history: 'Trung tâm Gia Sư Hoàng Hà được thành lập vào năm 2015.',
+    mission: 'Cung cấp môi trường học tập chất lượng, hiệu quả.',
+    vision: 'Trở thành trung tâm gia sư hàng đầu tại Thanh Hóa.',
+    workingHours: {
+      weekdays: '7:30 - 20:00',
+      weekend: '8:00 - 17:00',
+    },
+    slogan: 'DẪN LỐI TRI THỨC - VỮNG BƯỚC TƯƠNG LAI',
+  };
+};
+
+// Get all banners
+export const getBanners = async (): Promise<Banner[]> => {
+  // TODO: Replace with real API call when backend is ready
+  // GET /api/banners
+  if (!USE_MOCK_DATA) {
+    try {
+      // const response = await api.get('/banners');
+      // return response.data;
+    } catch (error) {
+      console.error('Error fetching banners from API:', error);
       throw error;
     }
   }
 
-  // Using mock data
-  return new Promise(resolve => {
-    setTimeout(() => {
-      // Check if user exists, otherwise create new
-      let user = mockData.users.find(user => user.phone === phone);
-      let userId = user?.id || '';
+  // Return empty array since mockData is removed
+  return [];
+};
 
-      if (!user) {
-        userId = `user${generateId()}`;
-        const newUser: User = {
-          id: userId,
-          name,
-          phone,
-          email,
-          inquiries: [],
-        };
+// Submit contact inquiry
+export const submitInquiry = async (inquiry: Omit<Inquiry, 'id' | 'createdAt'>): Promise<void> => {
+  // TODO: Replace with real API call when backend is ready
+  // POST /api/inquiries
+  if (!USE_MOCK_DATA) {
+    try {
+      // const response = await api.post('/inquiries', inquiry);
+      // return response.data;
+    } catch (error) {
+      console.error('Error submitting inquiry to API:', error);
+      throw error;
+    }
+  }
 
-        mockData.users.push(newUser);
-        user = newUser;
-      }
+  // Simulate successful submission
+  console.log('Inquiry submitted (mock):', inquiry);
+};
 
-      // Create inquiry
-      const inquiry: Inquiry = {
-        id: `inq${generateId()}`,
-        userId,
-        message,
-        date: new Date().toISOString().split('T')[0],
-        status: 'new',
-      };
+// Submit course registration
+export const submitRegistration = async (registration: Omit<Registration, 'id' | 'registrationDate'>): Promise<void> => {
+  // TODO: Replace with real API call when backend is ready
+  // POST /api/registrations
+  if (!USE_MOCK_DATA) {
+    try {
+      // const response = await api.post('/registrations', registration);
+      // return response.data;
+    } catch (error) {
+      console.error('Error submitting registration to API:', error);
+      throw error;
+    }
+  }
 
-      // Add to user's inquiries
-      if (user.inquiries) {
-        user.inquiries.push(inquiry);
-      } else {
-        user.inquiries = [inquiry];
-      }
-
-      resolve(inquiry);
-    }, 600);
-  });
+  // Simulate successful registration
+  console.log('Registration submitted (mock):', registration);
 };

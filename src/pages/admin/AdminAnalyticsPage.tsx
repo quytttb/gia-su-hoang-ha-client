@@ -1,7 +1,7 @@
 import React from 'react';
 import AdminLayout from '../../components/admin/layout/AdminLayout';
 import AnalyticsDashboard from '../../components/admin/AnalyticsDashboard';
-import CoursesStats from '../../components/admin/CoursesStats';
+import ClassesStats from '../../components/admin/ClassesStats';
 
 const AdminAnalyticsPage: React.FC = () => {
      return (
@@ -16,7 +16,7 @@ const AdminAnalyticsPage: React.FC = () => {
                     </div>
 
                     {/* Analytics Components */}
-                    <CoursesStats />
+                    <ClassesStats />
                     <AnalyticsDashboard />
                </div>
           </AdminLayout>

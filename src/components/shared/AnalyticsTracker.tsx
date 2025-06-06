@@ -18,7 +18,7 @@ const AnalyticsTracker = () => {
           const pageTitles: Record<string, string> = {
                '/': 'Trang Chủ - Trung Tâm Gia Sư Hoàng Hà',
                '/about': 'Giới Thiệu - Trung Tâm Gia Sư Hoàng Hà',
-               '/courses': 'Khóa Học - Trung Tâm Gia Sư Hoàng Hà',
+               '/classes': 'Khóa Học - Trung Tâm Gia Sư Hoàng Hà',
                '/schedule': 'Lịch Học - Trung Tâm Gia Sư Hoàng Hà',
                '/contact': 'Liên Hệ - Trung Tâm Gia Sư Hoàng Hà',
                '/panel': 'Panel - Trung Tâm Gia Sư Hoàng Hà',
@@ -28,9 +28,9 @@ const AnalyticsTracker = () => {
           let pageTitle = pageTitles[location.pathname];
 
           // Handle dynamic routes
-          if (location.pathname.startsWith('/courses/') && location.pathname.includes('/register')) {
+          if (location.pathname.startsWith('/classes/') && location.pathname.includes('/register')) {
                pageTitle = 'Đăng Ký Khóa Học - Trung Tâm Gia Sư Hoàng Hà';
-          } else if (location.pathname.startsWith('/courses/')) {
+          } else if (location.pathname.startsWith('/classes/')) {
                pageTitle = 'Chi Tiết Khóa Học - Trung Tâm Gia Sư Hoàng Hà';
           }
 

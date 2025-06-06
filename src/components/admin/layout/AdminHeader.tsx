@@ -28,7 +28,7 @@ interface AdminHeaderProps {
 
 const routeTitles: Record<string, string> = {
      '/panel': 'Tổng quan',
-     '/panel/courses': 'Quản lý Khóa học',
+     '/panel/classes': 'Quản lý Lớp học',
      '/panel/schedules': 'Quản lý Lịch học',
      '/panel/registrations': 'Quản lý Đăng ký',
      '/panel/inquiries': 'Quản lý Tin nhắn',

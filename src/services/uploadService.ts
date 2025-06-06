@@ -26,14 +26,25 @@ export class UploadService {
           return CloudinaryService.uploadImage(file, folder, onProgress, customFilename, order);
      }
 
-     // Upload banner image specifically
+     // Upload banner image
      static async uploadBannerImage(
           file: File,
           onProgress?: (progress: UploadProgress) => void,
           customFilename?: string,
           order?: number
      ): Promise<UploadResult> {
-          return this.uploadFile(file, 'banners', onProgress, customFilename, order);
+          this.validateFile(file);
+          return CloudinaryService.uploadImage(file, 'banners', onProgress, customFilename, order);
+     }
+
+     // Upload tutor image
+     static async uploadTutorImage(
+          file: File,
+          onProgress?: (progress: UploadProgress) => void,
+          customFilename?: string
+     ): Promise<UploadResult> {
+          this.validateFile(file);
+          return CloudinaryService.uploadImage(file, 'tutors', onProgress, customFilename);
      }
 
      // Delete file using Cloudinary

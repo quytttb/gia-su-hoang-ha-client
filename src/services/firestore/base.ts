@@ -72,7 +72,17 @@ export abstract class BaseFirestoreService<T extends FirestoreDocument> {
 
      // Get document reference
      protected getDocRef(id: string): DocumentReference<DocumentData> | null {
-          if (!db) return null;
+          if (!db) {
+               console.error('Firestore not initialized');
+               return null;
+          }
+
+          if (!id || typeof id !== 'string' || id.trim() === '') {
+               console.error('Invalid document ID:', id);
+               return null;
+          }
+
+          console.log(`Getting doc ref for collection: ${this.collectionName}, ID: ${id}`);
           return doc(db as Firestore, this.collectionName, id);
      }
 

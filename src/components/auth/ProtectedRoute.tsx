@@ -166,10 +166,10 @@ const getRoleDisplayName = (role: UserRole): string => {
 // Helper function to get permission display name
 const getPermissionDisplayName = (permission: string): string => {
      const permissionNames: Record<string, string> = {
-          view_courses: 'Xem khóa học',
-          create_course: 'Tạo khóa học',
-          edit_course: 'Chỉnh sửa khóa học',
-          delete_course: 'Xóa khóa học',
+          view_courses: 'Xem lớp học',
+          create_course: 'Tạo lớp học',
+          edit_course: 'Chỉnh sửa lớp học',
+          delete_course: 'Xóa lớp học',
           view_registrations: 'Xem đăng ký',
           approve_registration: 'Duyệt đăng ký',
           cancel_registration: 'Hủy đăng ký',

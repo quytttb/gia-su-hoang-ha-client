@@ -8,6 +8,9 @@ export interface Schedule {
      teacher: string;
      classroom: string;
      status?: 'active' | 'inactive';
+     maxStudents?: number;
+     studentPhones?: string[];
+     room: string;
 }
 
 interface ScheduleTableProps {
@@ -27,6 +30,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onEdit, onDele
                               <th className="p-3 text-left font-semibold text-foreground">Giáo viên</th>
                               <th className="p-3 text-left font-semibold text-foreground">Lớp học</th>
                               <th className="p-3 text-left font-semibold text-foreground">Trạng thái</th>
+                              <th className="p-3 text-left font-semibold text-foreground">Học viên</th>
                               <th className="p-3 text-left font-semibold text-foreground">Hành động</th>
                          </tr>
                     </thead>
@@ -48,6 +52,9 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onEdit, onDele
                                              ) : (
                                                   <span className="inline-block px-2 py-1 text-xs rounded bg-gray-700 text-gray-200 font-semibold">Đã ẩn</span>
                                              )}
+                                        </td>
+                                        <td className="p-3 align-middle">
+                                             {(schedule.studentPhones || []).length} / {schedule.maxStudents || 0}
                                         </td>
                                         <td className="p-3 align-middle space-x-2">
                                              <Button variant="outline" size="sm" className="text-foreground" onClick={() => onEdit(schedule)}>

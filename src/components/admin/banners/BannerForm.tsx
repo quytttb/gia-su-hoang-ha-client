@@ -253,11 +253,11 @@ const BannerForm: React.FC<BannerFormProps> = ({
           },
           {
                group: 'Khóa học', options: [
-                    { value: '/courses', label: 'Tất cả khóa học' },
-                    { value: '/courses/1', label: 'Khóa học 1 (Luyện thi đại học)' },
-                    { value: '/courses/2', label: 'Khóa học 2 (Tiếng Anh giao tiếp)' },
-                    { value: '/courses/3', label: 'Khóa học 3 (Khóa học hè)' },
-                    { value: '/courses/4', label: 'Khóa học 4 (Luyện thi vào lớp 10)' },
+                    { value: '/classes', label: 'Tất cả lớp học' },
+                    { value: '/classes/1', label: 'Khóa học 1 (Luyện thi đại học)' },
+                    { value: '/classes/2', label: 'Khóa học 2 (Tiếng Anh giao tiếp)' },
+                    { value: '/classes/3', label: 'Khóa học 3 (Khóa học hè)' },
+                    { value: '/classes/4', label: 'Khóa học 4 (Luyện thi vào lớp 10)' },
                ]
           },
           {

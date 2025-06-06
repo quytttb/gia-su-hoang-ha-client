@@ -4,6 +4,7 @@ import {
   trackChatbotClose,
   trackQuickReplyClick
 } from '../../utils/chatbotAnalytics';
+import { parseMarkdown } from '../../utils/parseMarkdown';
 
 export type ChatMessage = {
   id: string;
@@ -30,17 +31,17 @@ const defaultFAQs: ChatbotFAQ[] = [
     keywords: ['giờ', 'làm việc', 'mở cửa', 'đóng cửa', 'thời gian'],
     question: 'Trung tâm mở cửa những giờ nào?',
     answer: `🕐 **Giờ làm việc của trung tâm:**\n\n📅 **Thứ 2 - Thứ 6:** 7:30 - 20:00\n📅 **Thứ 7 - Chủ nhật:** 8:00 - 17:00\n\n💡 *Bạn có thể đến trực tiếp hoặc gọi điện trong giờ làm việc!*`,
-    quickReplies: ['Xem khóa học', 'Liên hệ ngay', 'Địa chỉ trung tâm'],
+    quickReplies: ['Xem lớp học', 'Liên hệ ngay', 'Địa chỉ trung tâm'],
   },
   {
     keywords: ['học phí', 'giá', 'tiền', 'thanh toán', 'phí', 'chi phí'],
-    question: 'Học phí các khóa học là bao nhiêu?',
+    question: 'Học phí các lớp học là bao nhiêu?',
     answer: `💰 **Bảng học phí tham khảo:**\n\n📚 **Luyện thi THPT:** 2.500.000đ - 4.000.000đ\n📖 **Ôn thi Đại học:** 3.000.000đ - 4.500.000đ\n✏️ **Bổ trợ kiến thức:** 1.800.000đ - 2.800.000đ\n👥 **Gia sư 1-1:** 3.500.000đ - 5.000.000đ\n\n🎁 *Hiện có nhiều chương trình ưu đãi hấp dẫn!*`,
-    quickReplies: ['Xem chi tiết khóa học', 'Đăng ký tư vấn', 'Chương trình ưu đãi'],
+    quickReplies: ['Xem chi tiết lớp học', 'Đăng ký tư vấn', 'Chương trình ưu đãi'],
   },
   {
     keywords: ['đăng ký', 'tham gia', 'ghi danh', 'đăng kí'],
-    question: 'Làm thế nào để đăng ký khóa học?',
+    question: 'Làm thế nào để đăng ký lớp học?',
     answer: `📝 **3 cách đăng ký dễ dàng:**\n\n🌐 **Online:** Đăng ký trực tuyến trên website\n📞 **Hotline:** 0385.510.892 - 0962.390.161\n🏢 **Trực tiếp:** Đến trung tâm tại Thanh Hóa\n\n✨ *Đăng ký ngay để nhận ưu đãi đặc biệt!*`,
     type: 'contact',
     quickReplies: ['Đăng ký online', 'Gọi hotline', 'Xem địa chỉ'],
@@ -62,7 +63,7 @@ const defaultFAQs: ChatbotFAQ[] = [
     keywords: ['giáo viên', 'giảng viên', 'gia sư', 'thầy', 'cô'],
     question: 'Giáo viên tại trung tâm có kinh nghiệm không?',
     answer: `👨‍🏫 **Đội ngũ giáo viên chất lượng:**\n\n🎓 **Trình độ:** Thạc sĩ, Tiến sĩ các trường ĐH hàng đầu\n⭐ **Kinh nghiệm:** 5-15 năm giảng dạy\n🏆 **Thành tích:** Nhiều học sinh đỗ ĐH top đầu\n💡 **Phương pháp:** Hiện đại, phù hợp từng học sinh\n\n✨ *100% giáo viên được tuyển chọn kỹ lưỡng!*`,
-    quickReplies: ['Xem giáo viên', 'Đăng ký học thử', 'Tư vấn khóa học'],
+    quickReplies: ['Xem giáo viên', 'Đăng ký học thử', 'Tư vấn lớp học'],
   },
   {
     keywords: ['lịch học', 'thời khóa biểu', 'ca học', 'buổi học'],
@@ -79,7 +80,7 @@ const defaultFAQs: ChatbotFAQ[] = [
   {
     keywords: ['hoàn tiền', 'đổi khóa', 'hủy', 'chính sách'],
     question: 'Chính sách hoàn tiền của trung tâm là gì?',
-    answer: `💯 **Chính sách linh hoạt:**\n\n✅ **Hoàn tiền 100%** nếu không hài lòng sau 3 buổi đầu\n🔄 **Đổi khóa học** miễn phí (cùng giá trị)\n⏰ **Bảo lưu học phí** đến 6 tháng\n📞 **Hỗ trợ 24/7** giải quyết thắc mắc\n\n🤝 *Cam kết minh bạch, uy tín!*`,
+    answer: `💯 **Chính sách linh hoạt:**\n\n✅ **Hoàn tiền 100%** nếu không hài lòng sau 3 buổi đầu\n🔄 **Đổi lớp học** miễn phí (cùng giá trị)\n⏰ **Bảo lưu học phí** đến 6 tháng\n📞 **Hỗ trợ 24/7** giải quyết thắc mắc\n\n🤝 *Cam kết minh bạch, uy tín!*`,
     quickReplies: ['Tìm hiểu thêm', 'Liên hệ tư vấn', 'Đăng ký ngay'],
   },
   {
@@ -91,85 +92,16 @@ const defaultFAQs: ChatbotFAQ[] = [
   },
 ];
 
-// Function to parse markdown-like formatting
-const parseMarkdown = (text: string) => {
-  // Split text by lines to preserve line breaks
-  const lines = text.split('\n');
-
-  return lines.map((line, lineIndex) => {
-    const parts = [];
-    let currentIndex = 0;
-
-    // Check if line is a bullet point
-    const isBulletPoint = line.trim().startsWith('•') || line.trim().startsWith('-');
-    const bulletContent = isBulletPoint ? line.trim().substring(1).trim() : line;
-    const textToProcess = isBulletPoint ? bulletContent : line;
-
-    // Find all bold text patterns **text**
-    const boldRegex = /\*\*(.*?)\*\*/g;
-    let match;
-
-    while ((match = boldRegex.exec(textToProcess)) !== null) {
-      // Add text before the bold part
-      if (match.index > currentIndex) {
-        parts.push(
-          <span key={`text-${lineIndex}-${currentIndex}`}>
-            {textToProcess.slice(currentIndex, match.index)}
-          </span>
-        );
-      }
-
-      // Add the bold part
-      parts.push(
-        <strong key={`bold-${lineIndex}-${match.index}`} className="font-semibold text-gray-900 dark:text-gray-100">
-          {match[1]}
-        </strong>
-      );
-
-      currentIndex = match.index + match[0].length;
-    }
-
-    // Add remaining text after the last bold part
-    if (currentIndex < textToProcess.length) {
-      parts.push(
-        <span key={`text-${lineIndex}-${currentIndex}`}>{textToProcess.slice(currentIndex)}</span>
-      );
-    }
-
-    // If no bold text found, return the original line
-    if (parts.length === 0) {
-      parts.push(<span key={`line-${lineIndex}`}>{textToProcess}</span>);
-    }
-
-    // Wrap in appropriate container
-    const content = isBulletPoint ? (
-      <div key={`line-${lineIndex}`} className="flex items-start space-x-2 ml-2">
-        <span className="text-blue-600 font-bold mt-0.5">•</span>
-        <div>{parts}</div>
-      </div>
-    ) : (
-      <div key={`line-${lineIndex}`}>{parts}</div>
-    );
-
-    return (
-      <>
-        {content}
-        {lineIndex < lines.length - 1 && !isBulletPoint && <br />}
-      </>
-    );
-  });
-};
-
 const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       content:
-        '👋 **Xin chào! Tôi là trợ lý ảo của Trung tâm Gia Sư Hoàng Hà.**\n\n💡 Tôi có thể giúp bạn:\n• Tìm hiểu về khóa học\n• Xem học phí và lịch học\n• Hướng dẫn đăng ký\n• Thông tin liên hệ\n\n❓ **Bạn muốn hỏi gì?**',
+        '👋 **Xin chào! Tôi là trợ lý ảo của Trung tâm Gia Sư Hoàng Hà.**\n\n💡 Tôi có thể giúp bạn:\n• Tìm hiểu về lớp học\n• Xem học phí và lịch học\n• Hướng dẫn đăng ký\n• Thông tin liên hệ\n\n❓ **Bạn muốn hỏi gì?**',
       isBot: true,
       type: 'quick-reply',
-      quickReplies: ['Xem khóa học', 'Học phí', 'Đăng ký', 'Liên hệ', 'Facebook'],
+      quickReplies: ['Xem lớp học', 'Học phí', 'Đăng ký', 'Liên hệ', 'Facebook'],
     },
   ]);
   const [userInput, setUserInput] = useState('');
@@ -282,7 +214,7 @@ const Chatbot = ({ faqs = defaultFAQs }: ChatbotProps) => {
     ) {
       return {
         id: Date.now().toString(),
-        content: `👋 **Xin chào! Rất vui được hỗ trợ bạn!**\n\n🎯 **Tôi có thể giúp bạn:**\n• 📚 Thông tin các khóa học\n• 💰 Bảng giá học phí\n• 📅 Lịch học và đăng ký\n• 📞 Thông tin liên hệ\n• 📱 Kết nối Facebook\n\n❓ **Bạn muốn tìm hiểu về điều gì?**`,
+        content: `👋 **Xin chào! Rất vui được hỗ trợ bạn!**\n\n🎯 **Tôi có thể giúp bạn:**\n• 📚 Thông tin các lớp học\n• 💰 Bảng giá học phí\n• 📅 Lịch học và đăng ký\n• 📞 Thông tin liên hệ\n• 📱 Kết nối Facebook\n\n❓ **Bạn muốn tìm hiểu về điều gì?**`,
         isBot: true,
         type: 'quick-reply',
         quickReplies: ['Khóa học', 'Học phí', 'Đăng ký', 'Liên hệ', 'Facebook'],

@@ -9,7 +9,7 @@ const AdminRegistrationsPage: React.FC = () => {
                     <div className="bg-card rounded-lg p-6 border">
                          <h2 className="text-2xl font-bold text-foreground mb-2">Quản lý Đăng ký</h2>
                          <p className="text-muted-foreground">
-                              Xem và xử lý các đăng ký khóa học từ học viên.
+                              Xem và xử lý các đăng ký lớp học từ học viên.
                          </p>
                     </div>
 

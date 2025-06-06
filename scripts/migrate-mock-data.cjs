@@ -34,11 +34,11 @@ const mockData = {
      centerInfo: {
           id: '1',
           name: 'Trung tâm Gia Sư Hoàng Hà',
-          description: 'Trung tâm Gia Sư Hoàng Hà tự hào là nơi cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa. Với đội ngũ giáo viên giỏi, nhiệt tình, chúng tôi cam kết mang đến những khóa học hiệu quả, giúp học sinh nâng cao kiến thức và kỹ năng.',
+          description: 'Trung tâm Gia Sư Hoàng Hà tự hào là nơi cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa. Với đội ngũ giáo viên giỏi, nhiệt tình, chúng tôi cam kết mang đến những lớp học hiệu quả, giúp học sinh nâng cao kiến thức và kỹ năng.',
           address: '265 - ĐƯỜNG 06 - MẶT BẰNG 08, PHƯỜNG NAM NGẠN, THÀNH PHỐ THANH HOÁ, TỈNH THANH HOÁ',
           phone: '0385.510.892 - 0962.390.161',
           email: 'lienhe@giasuhoangha.com',
-          history: 'Trung tâm Gia Sư Hoàng Hà được thành lập vào năm 2015 với mục tiêu ban đầu là cung cấp các dịch vụ gia sư cho học sinh tiểu học và THCS. Trải qua 10 năm hoạt động, chúng tôi đã không ngừng phát triển và mở rộng các khóa học, từ mầm non đến luyện thi đại học, đáp ứng nhu cầu học tập đa dạng của học sinh Thanh Hóa.',
+          history: 'Trung tâm Gia Sư Hoàng Hà được thành lập vào năm 2015 với mục tiêu ban đầu là cung cấp các dịch vụ gia sư cho học sinh tiểu học và THCS. Trải qua 10 năm hoạt động, chúng tôi đã không ngừng phát triển và mở rộng các lớp học, từ mầm non đến luyện thi đại học, đáp ứng nhu cầu học tập đa dạng của học sinh Thanh Hóa.',
           mission: 'Sứ mệnh của chúng tôi là cung cấp môi trường học tập chất lượng, hiệu quả, giúp học sinh phát triển toàn diện về kiến thức và kỹ năng sống.',
           vision: 'Trở thành trung tâm gia sư hàng đầu tại Thanh Hóa, mang đến giải pháp giáo dục toàn diện cho học sinh các cấp.',
           workingHours: {

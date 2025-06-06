@@ -176,23 +176,23 @@ export const bannerService = {
 
           const sampleBanners = [
                {
-                    imageUrl: 'https://res.cloudinary.com/dobcvvl12/image/upload/v1706166853/courses/1706166852097_c0ivgxv6woc.jpg',
+                    imageUrl: 'https://res.cloudinary.com/dobcvvl12/image/upload/v1706166853/classes/1706166852097_c0ivgxv6woc.jpg',
                     title: 'Chào mừng đến với Gia Sư Hoàng Hà',
                     subtitle: 'Nơi đào tạo và phát triển tài năng trẻ',
-                    link: '/courses',
+                    link: '/classes',
                     isActive: true,
                     order: 1,
                },
                {
-                    imageUrl: 'https://res.cloudinary.com/dobcvvl12/image/upload/v1706166883/courses/1706166882415_qyjgn5okg54.jpg',
+                    imageUrl: 'https://res.cloudinary.com/dobcvvl12/image/upload/v1706166883/classes/1706166882415_qyjgn5okg54.jpg',
                     title: 'Khóa học mới - Toán nâng cao',
                     subtitle: 'Chuẩn bị cho kỳ thi học sinh giỏi',
-                    link: '/courses',
+                    link: '/classes',
                     isActive: true,
                     order: 2,
                },
                {
-                    imageUrl: 'https://res.cloudinary.com/dobcvvl12/image/upload/v1706166916/courses/1706166915610_tl1ywzlqnx.jpg',
+                    imageUrl: 'https://res.cloudinary.com/dobcvvl12/image/upload/v1706166916/classes/1706166915610_tl1ywzlqnx.jpg',
                     title: 'Đăng ký ngay hôm nay',
                     subtitle: 'Nhận ưu đãi 20% cho học viên mới',
                     link: '/contact',

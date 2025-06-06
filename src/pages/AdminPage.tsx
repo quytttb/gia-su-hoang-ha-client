@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/admin/layout/AdminLayout';
-import coursesService from '../services/firestore/coursesService';
+import coursesService from '../services/firestore/classesService';
 import schedulesService from '../services/firestore/schedulesService';
 
 const AdminPage = () => {
@@ -63,7 +63,7 @@ const AdminPage = () => {
         {/* Quick Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-card rounded-lg p-6 border">
-            <h3 className="text-sm font-medium text-muted-foreground">Tổng khóa học</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Tổng lớp học</h3>
             <p className="text-2xl font-bold text-foreground">24</p>
             <p className="text-xs text-muted-foreground">+2 từ tháng trước</p>
           </div>
@@ -92,7 +92,7 @@ const AdminPage = () => {
               <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
                 <span className="text-primary text-xl">📚</span>
               </div>
-              <span className="text-sm font-medium text-foreground">Thêm khóa học</span>
+              <span className="text-sm font-medium text-foreground">Thêm lớp học</span>
             </button>
             <button className="flex flex-col items-center p-4 rounded-lg border hover:bg-accent transition-colors">
               <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">

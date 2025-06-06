@@ -9,9 +9,11 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 // Lazy load pages for better performance
 const HomePage = lazy(() => import('./pages/HomePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
-const CoursesPage = lazy(() => import('./pages/CoursesPage'));
-const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'));
-const CourseRegistrationPage = lazy(() => import('./pages/CourseRegistrationPage'));
+const ClassesPage = lazy(() => import('./pages/ClassesPage'));
+const ClassDetailPage = lazy(() => import('./pages/ClassDetailPage'));
+const ClassRegistrationPage = lazy(() => import('./pages/ClassRegistrationPage'));
+const TutorSearchPage = lazy(() => import('./pages/TutorSearchPage'));
+const TutorRegistrationPage = lazy(() => import('./pages/TutorRegistrationPage'));
 const SchedulePage = lazy(() => import('./pages/SchedulePage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
@@ -20,7 +22,7 @@ const TestPage = lazy(() => import('./pages/Test'));
 const TestErrorPage = lazy(() => import('./pages/TestError'));
 
 // Admin pages
-const AdminCoursesPage = lazy(() => import('./pages/admin/AdminCoursesPage'));
+const AdminClassesPage = lazy(() => import('./pages/admin/AdminClassesPage'));
 const AdminSchedulesPage = lazy(() => import('./pages/admin/AdminSchedulesPage'));
 const AdminRegistrationsPage = lazy(() => import('./pages/admin/AdminRegistrationsPage'));
 const AdminInquiriesPage = lazy(() => import('./pages/admin/AdminInquiriesPage'));
@@ -28,6 +30,7 @@ const AdminBannersPage = lazy(() => import('./pages/admin/AdminBannersPage'));
 const AdminStaffPage = lazy(() => import('./pages/admin/AdminStaffPage'));
 const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
+const AdminTutorsPage = lazy(() => import('./pages/admin/AdminTutorsPage'));
 
 const App = () => {
   return (
@@ -39,9 +42,11 @@ const App = () => {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/courses" element={<CoursesPage />} />
-              <Route path="/courses/:id" element={<CourseDetailPage />} />
-              <Route path="/courses/:id/register" element={<CourseRegistrationPage />} />
+              <Route path="/classes" element={<ClassesPage />} />
+              <Route path="/classes/:id" element={<ClassDetailPage />} />
+              <Route path="/classes/:id/register" element={<ClassRegistrationPage />} />
+              <Route path="/tutor-search" element={<TutorSearchPage />} />
+              <Route path="/tutor-search/register" element={<TutorRegistrationPage />} />
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -57,10 +62,10 @@ const App = () => {
                 }
               />
               <Route
-                path="/panel/courses"
+                path="/panel/classes"
                 element={
                   <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminCoursesPage />
+                    <AdminClassesPage />
                   </ProtectedRoute>
                 }
               />
@@ -117,6 +122,14 @@ const App = () => {
                 element={
                   <ProtectedRoute requiredRoles={['admin']}>
                     <AdminSettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/panel/tutors"
+                element={
+                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                    <AdminTutorsPage />
                   </ProtectedRoute>
                 }
               />

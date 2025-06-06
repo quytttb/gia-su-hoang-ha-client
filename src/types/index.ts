@@ -39,8 +39,8 @@ export interface Tutor {
   imageUrl: string;
 }
 
-// Course types
-export interface Course {
+// Class types
+export interface Class {
   id: string;
   name: string;
   description: string;
@@ -58,14 +58,16 @@ export interface Course {
 // Schedule types
 export interface Schedule {
   id: string;
-  courseId: string;
-  courseName: string;
+  classId: string;
+  className: string;
   date: string;
   startTime: string;
   endTime: string;
   tutor: string;
   room: string;
-  studentIds: string[];
+  maxStudents?: number;
+  studentPhones: string[];
+  studentIds?: string[];
 }
 
 // User types
@@ -81,7 +83,7 @@ export interface User {
 export interface Registration {
   id: string;
   userId: string;
-  courseId: string;
+  classId: string;
   registrationDate: string;
   status: 'pending' | 'approved' | 'cancelled';
   paymentStatus: 'pending' | 'completed';

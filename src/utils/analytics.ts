@@ -60,13 +60,13 @@ export const trackEvent = (
      });
 };
 
-// Track course interactions
-export const trackCourseView = (courseId: string, courseName: string) => {
-     trackEvent('view_course', 'courses', `${courseId}-${courseName}`);
+// Track class interactions
+export const trackClassView = (classId: string, className: string) => {
+     trackEvent('view_class', 'classes', `${classId}-${className}`);
 };
 
-export const trackCourseRegistration = (courseId: string, courseName: string) => {
-     trackEvent('course_registration', 'conversions', `${courseId}-${courseName}`);
+export const trackClassRegistration = (classId: string, className: string) => {
+     trackEvent('class_registration', 'conversions', `${classId}-${className}`);
 };
 
 // Track contact form submissions

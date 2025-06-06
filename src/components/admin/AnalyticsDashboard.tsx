@@ -48,7 +48,7 @@ const AnalyticsDashboard: React.FC = () => {
      const [topPages] = useState<TopPage[]>([
           { page: 'Trang chủ', views: 1250, percentage: 35 },
           { page: 'Khóa học', views: 890, percentage: 25 },
-          { page: 'Chi tiết khóa học', views: 650, percentage: 18 },
+          { page: 'Chi tiết lớp học', views: 650, percentage: 18 },
           { page: 'Liên hệ', views: 420, percentage: 12 },
           { page: 'Giới thiệu', views: 360, percentage: 10 },
      ]);
@@ -119,21 +119,21 @@ const AnalyticsDashboard: React.FC = () => {
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <MetricCard
                          title="Tổng người dùng"
-                         value={metrics.totalUsers.toLocaleString()}
+                         value={metrics.totalUsers.toLocaleString('de-DE')}
                          icon={<UserGroupIcon className="h-6 w-6 text-blue-600" />}
                          trend="+12% tuần này"
                          color="#3B82F6"
                     />
                     <MetricCard
                          title="Lượt xem trang"
-                         value={metrics.pageViews.toLocaleString()}
+                         value={metrics.pageViews.toLocaleString('de-DE')}
                          icon={<EyeIcon className="h-6 w-6 text-green-600" />}
                          trend="+8% tuần này"
                          color="#10B981"
                     />
                     <MetricCard
-                         title="Xem khóa học"
-                         value={metrics.courseViews.toLocaleString()}
+                         title="Xem lớp học"
+                         value={metrics.courseViews.toLocaleString('de-DE')}
                          icon={<AcademicCapIcon className="h-6 w-6 text-purple-600" />}
                          trend="+15% tuần này"
                          color="#8B5CF6"
@@ -186,7 +186,7 @@ const AnalyticsDashboard: React.FC = () => {
                                         <div className="flex-1">
                                              <div className="flex items-center justify-between mb-1">
                                                   <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{page.page}</span>
-                                                  <span className="text-sm text-gray-500 dark:text-gray-400">{page.views.toLocaleString()}</span>
+                                                  <span className="text-sm text-gray-500 dark:text-gray-400">{page.views.toLocaleString('de-DE')}</span>
                                              </div>
                                              <div className="w-full bg-gray-200 rounded-full h-2">
                                                   <div
@@ -202,13 +202,13 @@ const AnalyticsDashboard: React.FC = () => {
 
                     {/* Top Courses */}
                     <div className="bg-white rounded-lg shadow-md p-6">
-                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Khóa học phổ biến</h3>
+                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Lớp học phổ biến</h3>
                          <div className="overflow-x-auto">
                               <table className="min-w-full">
                                    <thead>
                                         <tr className="border-b border-gray-200">
                                              <th className="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2">
-                                                  Khóa học
+                                                  Lớp học
                                              </th>
                                              <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2">
                                                   Lượt xem

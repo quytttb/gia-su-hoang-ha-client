@@ -108,95 +108,104 @@ export const seoData = {
     canonical: 'https://giasuhoangha.com/about',
   },
 
-  courses: {
-    title: 'Khóa học - Trung tâm Gia Sư Hoàng Hà',
+  classes: {
+    title: 'Lớp học - Trung tâm Gia Sư Hoàng Hà',
     description:
-      'Khám phá các khóa học chất lượng cao tại Trung tâm Gia Sư Hoàng Hà: Luyện thi THPT Quốc Gia, Tiếng Anh giao tiếp, Toán học, Văn học và nhiều khóa học khác.',
+      'Khám phá các lớp học chất lượng cao tại Trung tâm Gia Sư Hoàng Hà: Luyện thi THPT Quốc Gia, Tiếng Anh giao tiếp, Toán học, Văn học và nhiều lớp học khác.',
     keywords:
-      'khóa học gia sư, luyện thi THPT quốc gia thanh hóa, học tiếng anh thanh hóa, học toán thanh hóa, khóa học hè',
-    canonical: 'https://giasuhoangha.com/courses',
+      'lớp học gia sư, luyện thi THPT quốc gia thanh hóa, học tiếng anh thanh hóa, học toán thanh hóa, lớp học hè',
+    canonical: 'https://giasuhoangha.com/classes',
+  },
+
+  courses: {
+    title: 'Lớp học - Trung tâm Gia Sư Hoàng Hà',
+    description:
+      'Khám phá các lớp học chất lượng cao tại Trung tâm Gia Sư Hoàng Hà: Luyện thi THPT Quốc Gia, Tiếng Anh giao tiếp, Toán học, Văn học và nhiều lớp học khác.',
+    keywords:
+      'lớp học gia sư, luyện thi THPT quốc gia thanh hóa, học tiếng anh thanh hóa, học toán thanh hóa, lớp học hè',
+    canonical: 'https://giasuhoangha.com/classes',
   },
 
   contact: {
     title: 'Liên hệ - Trung tâm Gia Sư Hoàng Hà',
     description:
-      'Liên hệ với Trung tâm Gia Sư Hoàng Hà để được tư vấn miễn phí về các khóa học. Địa chỉ: 265 Đường 06, Phường Nam Ngạn, Thanh Hóa. Hotline: 0385.510.892',
+      'Liên hệ với Trung tâm Gia Sư Hoàng Hà để được tư vấn miễn phí về các lớp học. Địa chỉ: 265 Đường 06, Phường Nam Ngạn, Thanh Hóa. Hotline: 0385.510.892',
     keywords:
-      'liên hệ gia sư hoàng hà, địa chỉ trung tâm gia sư thanh hóa, số điện thoại gia sư, tư vấn khóa học',
+      'liên hệ gia sư hoàng hà, địa chỉ trung tâm gia sư thanh hóa, số điện thoại gia sư, tư vấn lớp học',
     canonical: 'https://giasuhoangha.com/contact',
   },
 
   schedule: {
     title: 'Lịch học - Trung tâm Gia Sư Hoàng Hà',
     description:
-      'Xem lịch học của các khóa học tại Trung tâm Gia Sư Hoàng Hà. Tra cứu lịch học theo ngày, khóa học hoặc số điện thoại đăng ký.',
+      'Xem lịch học của các lớp học tại Trung tâm Gia Sư Hoàng Hà. Tra cứu lịch học theo ngày, lớp học hoặc số điện thoại đăng ký.',
     keywords: 'lịch học gia sư, thời khóa biểu, lịch học thanh hóa, tra cứu lịch học',
     canonical: 'https://giasuhoangha.com/schedule',
   },
 };
 
 /**
- * Generate course-specific SEO data
+ * Generate class-specific SEO data
  */
-export const generateCourseSEO = (
-  courseName: string,
-  courseDescription: string,
-  courseId: string
+export const generateClassSEO = (
+  className: string,
+  classDescription: string,
+  classId: string
 ): SEOData => {
   return {
-    title: `${courseName} - Trung tâm Gia Sư Hoàng Hà`,
-    description: `${courseDescription.substring(0, 150)}... Đăng ký ngay tại Trung tâm Gia Sư Hoàng Hà, Thanh Hóa.`,
-    keywords: `${courseName.toLowerCase()}, khóa học ${courseName.toLowerCase()}, gia sư ${courseName.toLowerCase()}, học ${courseName.toLowerCase()} thanh hóa`,
-    canonical: `https://giasuhoangha.com/courses/${courseId}`,
+    title: `${className} - Trung tâm Gia Sư Hoàng Hà`,
+    description: `${classDescription.substring(0, 150)}... Đăng ký ngay tại Trung tâm Gia Sư Hoàng Hà, Thanh Hóa.`,
+    keywords: `${className.toLowerCase()}, lớp học ${className.toLowerCase()}, gia sư ${className.toLowerCase()}, học ${className.toLowerCase()} thanh hóa`,
+    canonical: `https://giasuhoangha.com/classes/${classId}`,
   };
 };
 
 /**
  * Generate registration page SEO data
  */
-export const generateRegistrationSEO = (courseName: string): SEOData => {
+export const generateRegistrationSEO = (className: string): SEOData => {
   return {
-    title: `Đăng ký ${courseName} - Trung tâm Gia Sư Hoàng Hà`,
-    description: `Đăng ký khóa học ${courseName} tại Trung tâm Gia Sư Hoàng Hà. Quy trình đăng ký nhanh chóng, đội ngũ giáo viên chất lượng cao.`,
-    keywords: `đăng ký ${courseName.toLowerCase()}, đăng ký khóa học, gia sư thanh hóa`,
-    ogTitle: `Đăng ký ${courseName} - Gia Sư Hoàng Hà`,
+    title: `Đăng ký ${className} - Trung tâm Gia Sư Hoàng Hà`,
+    description: `Đăng ký lớp học ${className} tại Trung tâm Gia Sư Hoàng Hà. Quy trình đăng ký nhanh chóng, đội ngũ giáo viên chất lượng cao.`,
+    keywords: `đăng ký ${className.toLowerCase()}, đăng ký lớp học, gia sư thanh hóa`,
+    ogTitle: `Đăng ký ${className} - Gia Sư Hoàng Hà`,
   };
 };
 
 /**
- * Generate structured data for a course
+ * Generate structured data for a class
  */
-export const generateCourseStructuredData = (course: any) => {
+export const generateClassStructuredData = (classData: any) => {
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',
-    name: course.name,
-    description: course.description,
+    name: classData.name,
+    description: classData.description,
     provider: {
       '@type': 'EducationalOrganization',
       name: 'Trung tâm Gia Sư Hoàng Hà',
       url: 'https://giasuhoangha.com',
     },
-    courseCode: course.id,
-    educationalLevel: course.category,
+    courseCode: classData.id,
+    educationalLevel: classData.category,
     audience: {
       '@type': 'EducationalAudience',
-      audienceType: course.targetAudience,
+      audienceType: classData.targetAudience,
     },
     offers: {
       '@type': 'Offer',
-      price: course.price,
+      price: classData.price,
       priceCurrency: 'VND',
       availability: 'https://schema.org/InStock',
       validFrom: new Date().toISOString(),
-      ...(course.discount &&
-        course.discountEndDate && {
-          priceValidUntil: course.discountEndDate,
-          discount: course.discount,
-        }),
+      ...(classData.discount &&
+        classData.discountEndDate && {
+        priceValidUntil: classData.discountEndDate,
+        discount: classData.discount,
+      }),
     },
-    image: course.imageUrl,
-    url: `https://giasuhoangha.com/courses/${course.id}`,
+    image: classData.imageUrl,
+    url: `https://giasuhoangha.com/classes/${classData.id}`,
     hasCourseInstance: {
       '@type': 'CourseInstance',
       courseMode: 'blended',
@@ -211,7 +220,7 @@ export const generateCourseStructuredData = (course: any) => {
           addressCountry: 'VN',
         },
       },
-      schedule: course.schedule,
+      schedule: classData.schedule,
     },
   };
 };

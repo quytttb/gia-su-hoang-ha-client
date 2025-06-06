@@ -161,7 +161,7 @@ const ContactPage = () => {
         <div className="container-custom text-center">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">Liên Hệ</h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Hãy liên hệ với chúng tôi nếu bạn có bất kỳ câu hỏi nào về các khóa học
+            Hãy liên hệ với chúng tôi nếu bạn có bất kỳ câu hỏi nào về các lớp học
           </p>
         </div>
       </section>
@@ -407,7 +407,7 @@ const ContactPage = () => {
                     <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Thời gian học tại trung tâm?</h4>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Trung tâm mở cửa từ 7:30 - 20:00 các ngày trong tuần và 8:00 - 17:00 vào cuối
-                      tuần. Thời gian cụ thể của mỗi khóa học sẽ được thông báo khi đăng ký.
+                      tuần. Thời gian cụ thể của mỗi lớp học sẽ được thông báo khi đăng ký.
                     </p>
                   </div>
 
@@ -417,7 +417,7 @@ const ContactPage = () => {
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Có, bạn có thể đăng ký học thử 1 buổi miễn phí tại trung tâm để trải nghiệm
-                      trước khi quyết định tham gia khóa học.
+                      trước khi quyết định tham gia lớp học.
                     </p>
                   </div>
 
