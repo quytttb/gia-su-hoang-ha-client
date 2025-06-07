@@ -97,3 +97,45 @@ export interface Inquiry {
   status: 'new' | 'in-progress' | 'resolved';
   response?: string;
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  subtitle?: string;
+  content: string;
+  excerpt: string;
+  author: string;
+  publishedAt: string;
+  updatedAt?: string;
+  imageUrl: string;
+  category: BlogCategory;
+  tags: string[];
+  status: 'draft' | 'published' | 'archived';
+  featured: boolean;
+  readTime: number; // in minutes
+  viewCount?: number;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
+}
+
+export interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+}
+
+export interface BlogComment {
+  id: string;
+  postId: string;
+  author: string;
+  email: string;
+  content: string;
+  createdAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  parentId?: string; // for replies
+}

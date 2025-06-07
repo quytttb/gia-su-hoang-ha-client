@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import Loading from './components/shared/Loading';
 import AnalyticsTracker from './components/shared/AnalyticsTracker';
+import ScrollToTop from './components/common/ScrollToTop';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -16,6 +17,8 @@ const TutorSearchPage = lazy(() => import('./pages/TutorSearchPage'));
 const TutorRegistrationPage = lazy(() => import('./pages/TutorRegistrationPage'));
 const SchedulePage = lazy(() => import('./pages/SchedulePage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogDetailPage = lazy(() => import('./pages/BlogDetailPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const TestPage = lazy(() => import('./pages/Test'));
@@ -37,6 +40,7 @@ const App = () => {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <AnalyticsTracker />
           <Suspense fallback={<Loading message="Đang tải trang..." />}>
             <Routes>
@@ -49,6 +53,8 @@ const App = () => {
               <Route path="/tutor-search/register" element={<TutorRegistrationPage />} />
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:id" element={<BlogDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/test" element={<TestPage />} />
               <Route path="/test-error" element={<TestErrorPage />} />

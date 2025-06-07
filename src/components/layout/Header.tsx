@@ -13,6 +13,7 @@ const Header = () => {
     { name: 'Lớp học', href: '/classes' },
     { name: 'Tìm gia sư', href: '/tutor-search' },
     { name: 'Lịch học', href: '/schedule' },
+    { name: 'Blog', href: '/blog' },
     { name: 'Liên hệ', href: '/contact' },
   ];
 

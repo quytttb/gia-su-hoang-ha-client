@@ -12,6 +12,7 @@ import { updateSEO, seoData } from '../utils/seo';
 import { convertFirestoreClass, getFeaturedClasses } from '../utils/classHelpers';
 import Chatbot from '../components/shared/Chatbot';
 import ErrorDisplay from '../components/shared/ErrorDisplay';
+import BlogSection from '../components/home/BlogSection';
 
 const HomePage = () => {
   const [banners, setBanners] = useState<BannerType[]>([]);
@@ -143,6 +144,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Blog Section */}
+      <BlogSection />
 
       {/* Contact CTA Section */}
       <section className="section-padding bg-primary text-white dark:bg-primary-700">
