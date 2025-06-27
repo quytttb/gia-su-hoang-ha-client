@@ -11,7 +11,7 @@ import Chatbot from '../components/shared/Chatbot';
 import ErrorDisplay from '../components/shared/ErrorDisplay';
 import SkeletonLoading from '../components/shared/SkeletonLoading';
 import { Dialog, DialogContent } from '../components/ui/dialog';
-import { Home, Users, School, MessageCircle, Award, BookOpen, Sparkles } from 'lucide-react';
+import { Home, Users, School, MessageCircle } from 'lucide-react';
 
 const AboutPage = () => {
   const [centerInfo, setCenterInfo] = useState<CenterInfo | null>(null);
