@@ -65,6 +65,16 @@ const Footer = ({ isContactPage = false }: FooterProps) => {
               </p>
               <p className="mb-2">Điện thoại: 0385.510.892 - 0962.390.161</p>
               <p className="mb-2">Email: giasuhoangha.tpth@gmail.com</p>
+              <p className="mb-2">
+                Facebook: <a
+                  href="https://www.facebook.com/profile.php?id=61575087818708"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Gia Sư Hoàng Hà - TP Thanh Hoá
+                </a>
+              </p>
             </address>
           </div>
 
@@ -77,14 +87,15 @@ const Footer = ({ isContactPage = false }: FooterProps) => {
             {!isContactPage && (
               <div className="mt-4 rounded overflow-hidden shadow">
                 <iframe
-                  title="Google Maps - Gia Sư Hoàng Hà"
-                  src="https://www.google.com/maps?q=265%20%C4%90%C6%B0%E1%BB%9Dng%2006%2C%20M%E1%BA%B7t%20B%E1%BA%B1ng%2008%2C%20Ph%C6%B0%E1%BB%9Dng%20Nam%20Ng%E1%BA%A1n%2C%20Th%C3%A0nh%20Ph%E1%BB%91%20Thanh%20Ho%C3%A1%2C%20T%E1%BB%89nh%20Thanh%20Ho%C3%A1&output=embed"
+                  title="Facebook Page - Gia Sư Hoàng Hà"
+                  src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D61575087818708&tabs=timeline&width=340&height=150&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
                   width="100%"
                   height="150"
                   style={{ border: 0 }}
+                  scrolling="no"
+                  frameBorder="0"
                   allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                 ></iframe>
               </div>
             )}
