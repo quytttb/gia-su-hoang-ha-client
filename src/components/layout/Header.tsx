@@ -27,12 +27,13 @@ const Header = () => {
       href: '/',
       hasDropdown: true,
       dropdown: [
-        { name: 'Trang chủ', href: '/' },
+        { name: 'Banner chính', href: '/#banner' },
         { name: 'Giới thiệu', href: '/#introduction' },
         { name: 'Lớp học nổi bật', href: '/#featured-classes' },
-        { name: 'Chia sẻ của phụ huynh', href: '/#feedback' },
         { name: 'Tin tức & Blog', href: '/#blog' },
+        { name: 'Chia sẻ của phụ huynh', href: '/#feedback' },
         { name: 'Liên hệ', href: '/#contact' },
+        { name: 'Đối tác', href: '/#partners' },
       ]
     },
     {
@@ -40,14 +41,18 @@ const Header = () => {
       href: '/about',
       hasDropdown: true,
       dropdown: [
-        { name: 'Giới thiệu', href: '/about' },
-        { name: 'Sứ mệnh & Tầm nhìn', href: '/about#mission-vision' },
-        { name: 'Lịch sử phát triển', href: '/about#history' },
+        { name: 'Giới thiệu trung tâm', href: '/about#about-intro' },
+        { name: 'Lịch sử phát triển', href: '/about#history-founder' },
+        { name: 'Tầm nhìn', href: '/about#vision' },
+        { name: 'Sứ mệnh', href: '/about#mission' },
+        { name: 'Dịch vụ cung cấp', href: '/about#services' },
+        { name: 'Thư ngỏ', href: '/about#letter' },
+        { name: 'Hình ảnh thực tế', href: '/about#gallery' },
         { name: 'Đội ngũ giáo viên', href: '/about#team' },
       ]
     },
     { name: 'Lớp học', href: '/classes' },
-    { name: 'Tìm gia sư', href: '/tutor-search' },
+    { name: 'Gia sư', href: '/tutor-search', },
     { name: 'Lịch học', href: '/schedule' },
     {
       name: 'Blog',

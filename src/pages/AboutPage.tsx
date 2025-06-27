@@ -345,19 +345,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Đối tác của chúng tôi */}
-      <section className="section-padding bg-white dark:bg-gray-900" id="partners">
-        <div className="container-custom">
-          <SectionHeading title="Đối tác của chúng tôi" id="partners-heading" />
-          <div className="flex flex-wrap justify-center items-center gap-8 mt-8">
-            <img src="/images/partners/lam_son.png" alt="THPT Chuyên Lam Sơn" className="h-20 md:h-28 object-contain max-w-[180px]" />
-            <img src="/images/partners/dao_duy_tu.png" alt="THPT Đào Duy Từ" className="h-20 md:h-28 object-contain max-w-[180px]" />
-            <img src="/images/partners/ham_rong.png" alt="THPT Hàm Rồng" className="h-20 md:h-28 object-contain max-w-[180px]" />
-            <img src="/images/partners/tran_mai_ninh.png" alt="THCS Trần Mai Ninh" className="h-20 md:h-28 object-contain max-w-[180px]" />
-          </div>
-        </div>
-      </section>
-
       {/* Gallery Section */}
       <section className="section-padding bg-white dark:bg-gray-900" aria-labelledby="gallery-heading">
         <div className="container-custom">
