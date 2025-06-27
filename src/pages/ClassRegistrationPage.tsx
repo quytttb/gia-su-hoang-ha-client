@@ -1,11 +1,13 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { Class, Registration, Schedule } from '../types';
+import { Class } from '../types';
 import classesService from '../services/firestore/classesService';
+import registrationsService from '../services/firestore/registrationsService';
 import { convertFirestoreClass } from '../utils/classHelpers';
 import { formatCurrency, hasValidDiscount } from '../utils/helpers';
 import Chatbot from '../components/shared/Chatbot';
+import DevFormHelper from '../components/dev/DevFormHelper';
 import {
   validateAndSanitizePhone,
   validateAndSanitizeName,
@@ -13,7 +15,6 @@ import {
   getClientIdentifier,
 } from '../utils/security';
 import { sendRegistrationEmail, sendAutoReplyEmail, initEmailJS } from '../services/emailService';
-import schedulesService from '../services/firestore/schedulesService';
 import confetti from 'canvas-confetti';
 import {
   Dialog,
@@ -31,7 +32,6 @@ const CourseRegistrationPage = () => {
   const [course, setCourse] = useState<Class | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [registration] = useState<Registration | null>(null);
   const [formData, setFormData] = useState({
     parentName: '',
     parentPhone: '',
@@ -41,30 +41,16 @@ const CourseRegistrationPage = () => {
     academicDescription: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
       if (!id) return;
-
-      try {
-        setLoading(true);
-        const result = await classesService.getById(id);
-        if (result.data) {
-          setCourse(convertFirestoreClass(result.data));
-        }
-        // Lấy lịch học
-        const schedulesData = await schedulesService.getByCourseId(id);
-        setSchedules(schedulesData);
-      } catch (error) {
-        console.error('Error fetching course:', error);
-      } finally {
-        setLoading(false);
-      }
+      const result = await classesService.getById(id);
+      setCourse(result.data ? convertFirestoreClass(result.data) : undefined);
+      setLoading(false);
     };
-
     fetchCourse();
 
     // Initialize EmailJS
@@ -75,6 +61,41 @@ const CourseRegistrationPage = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  // Dev helper functions
+  const handleDevFillForm = (data: any) => {
+    setFormData(data);
+    setErrors({}); // Clear any existing errors
+  };
+
+  const handleDevClearForm = () => {
+    setFormData({
+      parentName: '',
+      parentPhone: '',
+      parentAddress: '',
+      name: '',
+      school: '',
+      academicDescription: '',
+    });
+    setErrors({});
+  };
+
+  // Expose dev functions globally for DevAdminHelper
+  useEffect(() => {
+    // Only expose in development mode
+    if (process.env.NODE_ENV === 'development') {
+      (window as any).__devFormFill = handleDevFillForm;
+      (window as any).__devFormClear = handleDevClearForm;
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (process.env.NODE_ENV === 'development') {
+        delete (window as any).__devFormFill;
+        delete (window as any).__devFormClear;
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -123,8 +144,13 @@ const CourseRegistrationPage = () => {
 
   const handleConfirmSubmit = async () => {
     if (!id || !course) {
+      alert('Không tìm thấy thông tin lớp học. Vui lòng tải lại trang hoặc chọn lại lớp!');
       return;
     }
+
+    // Fallback an toàn cho tên và lịch lớp học
+    const courseName = course.name || 'Chưa xác định';
+    const courseSchedule = course.schedule || 'Linh hoạt';
 
     // Check rate limiting
     const clientId = getClientIdentifier();
@@ -147,31 +173,59 @@ const CourseRegistrationPage = () => {
       setSubmitting(true);
       setShowConfirmDialog(false);
 
+      const registrationData = {
+        // Registration type
+        type: 'class' as const,
+        classId: id,
+        className: courseName,
+        classSchedule: courseSchedule,
+        studentName: nameValidation.sanitized,
+        studentPhone: formData.parentPhone, // Using parent phone for now
+        studentSchool: formData.school, // Trường học của học viên
+        parentName: formData.parentName,
+        parentPhone: parentPhoneValidation.sanitized,
+        parentAddress: formData.parentAddress, // Địa chỉ phụ huynh
+        preferredSchedule: courseSchedule, // Sử dụng lịch với fallback
+        notes: formData.academicDescription || undefined, // Mô tả lực học
+        status: 'pending' as const,
+      };
+
+      // Debug: log registration data
+      console.log('🔍 Registration data:', registrationData);
+
+      const registrationResult = await registrationsService.createRegistration(registrationData);
+
+      if (registrationResult.error) {
+        alert(registrationResult.error);
+        return;
+      }
+
       // Send registration email
-      const result = await sendRegistrationEmail(
+      const emailResult = await sendRegistrationEmail(
         nameValidation.sanitized,
         '',
         parentPhoneValidation.sanitized,
-        course.name,
-        id
+        courseName,
+        id,
+        courseSchedule
       );
 
-      if (result.success) {
+      if (emailResult.success) {
         // Send auto-reply to student
         await sendAutoReplyEmail(nameValidation.sanitized, '', true);
-
-        // Hiệu ứng pháo hoa
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-
-        // Hiện dialog thành công
-        setShowSuccessDialog(true);
-      } else {
-        alert(result.message);
       }
+
+      // Show success regardless of email status
+      // Hiệu ứng pháo hoa
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      // Hiện dialog thành công
+      setShowSuccessDialog(true);
+
     } catch (error) {
       console.error('Error submitting registration:', error);
       alert('Đã có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ trực tiếp qua WhatsApp.');
@@ -209,62 +263,6 @@ const CourseRegistrationPage = () => {
           <Link to="/classes" className="btn-primary">
             Quay lại danh sách lớp học
           </Link>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (registration) {
-    return (
-      <Layout>
-        <div className="container-custom py-16">
-          <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-green-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Đăng ký thành công!</h2>
-              <p className="text-gray-600 dark:text-gray-400">Cảm ơn bạn đã đăng ký lớp học với Gia Sư Hoàng Hà.</p>
-            </div>
-
-            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Thông tin đăng ký:</h3>
-              <p className="text-gray-700 dark:text-gray-200 mb-1">
-                <strong>Lớp học:</strong> {course.name}
-              </p>
-              <p className="text-gray-700 dark:text-gray-200 mb-1">
-                <strong>Mã đăng ký:</strong> {registration.id}
-              </p>
-              <p className="text-gray-700 dark:text-gray-200 mb-1">
-                <strong>Trạng thái:</strong> Chờ xác nhận
-              </p>
-              <p className="text-gray-700 dark:text-gray-200">
-                <strong>Ngày đăng ký:</strong> {registration.registrationDate}
-              </p>
-            </div>
-
-            <div className="text-center">
-              <button onClick={() => navigate('/classes')} className="btn-primary w-full">
-                Quay lại trang lớp học
-              </button>
-              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để xác nhận đăng ký.
-              </p>
-            </div>
-          </div>
         </div>
       </Layout>
     );
@@ -339,7 +337,7 @@ const CourseRegistrationPage = () => {
                     <div className="text-center">
                       <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">Hoặc tư vấn qua:</p>
                       <button type="button" onClick={() => window.open('https://zalo.me/0385510892', '_blank')} className="w-full inline-flex items-center justify-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
-                        <img src="/assets/zalo-logo.svg" alt="Zalo" className="w-5 h-5" />
+                        <img src="/images/zalo-logo.svg" alt="Zalo" className="w-5 h-5" />
                         <span>Tư vấn qua Zalo</span>
                       </button>
                     </div>
@@ -364,18 +362,18 @@ const CourseRegistrationPage = () => {
                   {course.description.substring(0, 100)}...
                 </p>
                 <div className="mt-2 mb-4">
-                  <h5 className="font-semibold text-black dark:text-white mb-2">Lịch học</h5>
-                  {schedules.length === 0 ? (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Chưa có lịch học.</p>
-                  ) : (
-                    <ul className="text-sm text-gray-700 dark:text-gray-200 space-y-1">
-                      {schedules.map(sch => (
-                        <li key={sch.id} className="border-b border-gray-100 dark:border-gray-700 pb-1 last:border-0">
-                          <span className="font-medium">{sch.date}</span> - {sch.startTime}~{sch.endTime} | {sch.tutor} | Phòng: {sch.room}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <h5 className="font-semibold text-black dark:text-white mb-2">Thông tin lớp học</h5>
+                  <div className="text-sm text-gray-700 dark:text-gray-200 space-y-1">
+                    <div className="border-b border-gray-100 dark:border-gray-700 pb-1">
+                      <span className="font-medium">Lịch học:</span> thứ 2 đến 4
+                    </div>
+                    <div className="border-b border-gray-100 dark:border-gray-700 pb-1">
+                      <span className="font-medium">Giờ học:</span> 19:30 đến 21:30
+                    </div>
+                    <div className="pb-1">
+                      <span className="font-medium">Số lượng:</span> 12
+                    </div>
+                  </div>
                 </div>
                 <div className="border-t border-gray-200 pt-4 mb-4">
                   <div className="flex justify-between items-center mb-2">
@@ -441,6 +439,12 @@ const CourseRegistrationPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dev Form Helper - Only shows in development */}
+      <DevFormHelper
+        onFillForm={handleDevFillForm}
+        onClearForm={handleDevClearForm}
+      />
     </Layout>
   );
 };

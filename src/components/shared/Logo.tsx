@@ -15,9 +15,9 @@ const Logo: React.FC<LogoProps> = ({
      linkTo = '/'
 }) => {
      const sizeClasses = {
-          sm: 'h-10',
-          md: 'h-14',
-          lg: 'h-16'
+          sm: 'h-8 md:h-10',
+          md: 'h-12 md:h-14',
+          lg: 'h-14 md:h-16 lg:h-20'
      };
 
      const logoContent = () => {

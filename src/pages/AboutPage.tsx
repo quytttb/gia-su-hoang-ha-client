@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import SectionHeading from '../components/shared/SectionHeading';
 import LazyImage from '../components/shared/LazyImage';
@@ -8,12 +9,39 @@ import settingsService from '../services/firestore/settingsService';
 import { updateSEO, seoData } from '../utils/seo';
 import Chatbot from '../components/shared/Chatbot';
 import ErrorDisplay from '../components/shared/ErrorDisplay';
+import SkeletonLoading from '../components/shared/SkeletonLoading';
+import { Dialog, DialogContent } from '../components/ui/dialog';
+import { Home, Users, School, MessageCircle, Award, BookOpen, Sparkles } from 'lucide-react';
 
 const AboutPage = () => {
   const [centerInfo, setCenterInfo] = useState<CenterInfo | null>(null);
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [previewImg, setPreviewImg] = useState<string | null>(null);
+  const location = useLocation();
+
+  // Function to scroll to section
+  const scrollToSection = (sectionId: string) => {
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      }
+    }, 100);
+  };
+
+  // Handle scroll to section when page loads with hash
+  useEffect(() => {
+    if (location.hash && !loading) {
+      const sectionId = location.hash.replace('#', '');
+      scrollToSection(sectionId);
+    }
+  }, [location.hash, loading]);
 
   useEffect(() => {
     // Update SEO for about page
@@ -43,7 +71,7 @@ const AboutPage = () => {
           description: 'Trung tâm Gia Sư Hoàng Hà tự hào là nơi cung cấp dịch vụ gia sư chất lượng cao tại Thanh Hóa.',
           address: '265 - ĐƯỜNG 06 - MẶT BẰNG 08, PHƯỜNG NAM NGẠN, THÀNH PHỐ THANH HOÁ, TỈNH THANH HOÁ',
           phone: '0385.510.892 - 0962.390.161',
-          email: 'lienhe@giasuhoangha.com',
+          email: 'giasuhoangha.tpth@gmail.com',
           history: 'Trung tâm Gia Sư Hoàng Hà được thành lập vào năm 2015 với mục tiêu ban đầu là cung cấp các dịch vụ gia sư cho học sinh tiểu học và THCS.',
           mission: 'Sứ mệnh của chúng tôi là cung cấp môi trường học tập chất lượng, hiệu quả, giúp học sinh phát triển toàn diện về kiến thức và kỹ năng sống.',
           vision: 'Trở thành trung tâm gia sư hàng đầu tại Thanh Hóa, mang đến giải pháp giáo dục toàn diện cho học sinh các cấp.',
@@ -65,8 +93,41 @@ const AboutPage = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="section-padding">
+          <div className="container-custom">
+            {/* Hero Section Skeleton */}
+            <div className="text-center mb-16">
+              <SkeletonLoading type="text" count={2} className="mx-auto" />
+            </div>
+
+            {/* Mission & Vision Section Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+                <SkeletonLoading type="text" count={4} />
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+                <SkeletonLoading type="text" count={4} />
+              </div>
+            </div>
+
+            {/* History Section Skeleton */}
+            <div className="mb-16">
+              <div className="text-center mb-8">
+                <SkeletonLoading type="text" count={2} className="mx-auto" />
+              </div>
+              <SkeletonLoading type="text" count={5} />
+            </div>
+
+            {/* Team Section Skeleton */}
+            <div className="mb-16">
+              <div className="text-center mb-8">
+                <SkeletonLoading type="text" count={2} className="mx-auto" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <SkeletonLoading type="card" count={3} />
+              </div>
+            </div>
+          </div>
         </div>
       </Layout>
     );
@@ -97,51 +158,214 @@ const AboutPage = () => {
       )}
 
       {/* Hero Section */}
-      <section className="bg-gray-100 py-16 dark:bg-gray-900">
-        <div className="container-custom text-center">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">Về Chúng Tôi</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Trung tâm Gia Sư Hoàng Hà - đối tác đáng tin cậy trong hành trình giáo dục của bạn
-          </p>
-        </div>
+      <section
+        className="relative flex items-center justify-center min-h-[220px] md:min-h-[260px] bg-[#e3f0ff] dark:bg-gradient-to-b dark:from-[#182848] dark:to-[#35577d] py-8 md:py-10 overflow-hidden shadow-md border-b border-blue-200 dark:border-blue-900"
+      >
+        <img
+          src="/assets/images/gia-su-hoang-ha-header.jpg"
+          alt="Trung tâm Gia Sư Hoàng Hà"
+          className="absolute inset-0 m-auto w-full h-full object-cover opacity-80 pointer-events-none select-none z-0"
+          style={{ left: '0', right: '0', top: '0', bottom: '0' }}
+        />
       </section>
 
-      {/* Mission & Vision Section */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="bg-white p-8 rounded-lg shadow-md dark:bg-gray-800">
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Sứ mệnh</h3>
-              <p className="text-gray-700 dark:text-gray-200">{centerInfo.mission}</p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-md dark:bg-gray-800">
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Tầm nhìn</h3>
-              <p className="text-gray-700 dark:text-gray-200">{centerInfo.vision}</p>
+      {/* Giới thiệu trung tâm */}
+      <section className="section-padding bg-white dark:bg-gray-900" id="about-intro">
+        <div className="container-custom flex flex-col items-center justify-center text-center gap-8">
+          <div>
+            <h2 className="text-3xl font-bold mb-2 text-primary-700 dark:text-primary-400">Trung tâm Gia Sư Hoàng Hà</h2>
+            <p className="text-lg text-gray-700 dark:text-gray-200 mb-2">{centerInfo.description}</p>
+            <div className="text-gray-600 dark:text-gray-300 text-base">
+              <div><b>Địa chỉ:</b> {centerInfo.address}</div>
+              <div><b>Điện thoại:</b> {centerInfo.phone}</div>
+              <div><b>Email:</b> giasuhoangha.tpth@gmail.com</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* History Section */}
-      <section className="section-padding bg-gray-50 dark:bg-gray-900">
+      {/* Lịch sử phát triển & Chân dung nhà sáng lập */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-900" id="history-founder">
+        <div className="container-custom">
+          <div className="w-full text-center">
+            <SectionHeading title="Lịch sử phát triển" subtitle="Từ những ngày đầu thành lập đến hiện tại" id="history-heading" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center mt-8">
+            <div className="md:col-span-2">
+              <p className="text-gray-700 text-lg leading-relaxed dark:text-gray-200 mb-6">{centerInfo.history}</p>
+            </div>
+            <div className="flex flex-col items-center md:col-span-1">
+              <img src="/assets/images/founder-placeholder.jpg" alt="Nhà sáng lập" className="w-48 h-48 object-cover rounded-full shadow mb-4" />
+              <div className="text-center">
+                <div className="font-bold text-lg text-primary-700 dark:text-primary-400">Nhà sáng lập</div>
+                <div className="text-gray-700 dark:text-gray-200">(Đang cập nhật)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tầm nhìn */}
+      <section className="section-padding bg-white dark:bg-gray-900" id="vision">
+        <div className="container-custom">
+          <SectionHeading title="Tầm nhìn" subtitle="Định hướng phát triển của Gia Sư Hoàng Hà" id="vision-heading" />
+          <p className="text-gray-700 dark:text-gray-200 text-center text-lg mt-8">{centerInfo.vision}</p>
+        </div>
+      </section>
+
+      {/* Sứ mệnh */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-900" id="mission">
+        <div className="container-custom">
+          <SectionHeading title="Sứ mệnh" subtitle="Giá trị và mục tiêu trung tâm hướng tới" id="mission-heading" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-blue-50 dark:bg-blue-900">
+                <Award className="w-10 h-10 text-blue-500 dark:text-blue-300" />
+              </div>
+              <div className="font-semibold mb-1 text-center text-gray-900 dark:text-gray-100">Phát triển toàn diện học sinh</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Tạo môi trường học tập giúp học sinh phát triển cả kiến thức, kỹ năng và nhân cách.</div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-green-50 dark:bg-green-900">
+                <BookOpen className="w-10 h-10 text-green-500 dark:text-green-300" />
+              </div>
+              <div className="font-semibold mb-1 text-center text-gray-900 dark:text-gray-100">Chất lượng giảng dạy hàng đầu</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Đảm bảo đội ngũ giáo viên tận tâm, chuyên môn cao, phương pháp giảng dạy hiệu quả.</div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-yellow-50 dark:bg-yellow-900">
+                <Users className="w-10 h-10 text-yellow-500 dark:text-yellow-300" />
+              </div>
+              <div className="font-semibold mb-1 text-center text-gray-900 dark:text-gray-100">Đồng hành cùng phụ huynh và học sinh</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Lắng nghe, tư vấn, hỗ trợ phụ huynh và học sinh trong suốt quá trình học tập.</div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-purple-50 dark:bg-purple-900">
+                <Sparkles className="w-10 h-10 text-purple-500 dark:text-purple-300" />
+              </div>
+              <div className="font-semibold mb-1 text-center text-gray-900 dark:text-gray-100">Đổi mới, sáng tạo không ngừng</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Luôn cập nhật phương pháp, ứng dụng công nghệ mới để nâng cao chất lượng dịch vụ.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Dịch vụ cung cấp */}
+      <section className="section-padding bg-white dark:bg-gray-900" id="services">
+        <div className="container-custom">
+          <SectionHeading title="Chúng tôi cung cấp" subtitle="Các dịch vụ nổi bật tại Gia Sư Hoàng Hà" id="services-heading" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-blue-50 dark:bg-blue-900">
+                <Home className="w-10 h-10 text-blue-500 dark:text-blue-300" />
+              </div>
+              <div className="font-semibold mb-1 text-gray-900 dark:text-gray-100">Gia sư tại nhà 1 kèm 1</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Dạy kèm cá nhân, sát sao từng học sinh.</div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-green-50 dark:bg-green-900">
+                <Users className="w-10 h-10 text-green-500 dark:text-green-300" />
+              </div>
+              <div className="font-semibold mb-1 text-gray-900 dark:text-gray-100">Gia sư nhóm nhỏ</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Học nhóm 2-5 học sinh, tăng tương tác và hiệu quả.</div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-yellow-50 dark:bg-yellow-900">
+                <School className="w-10 h-10 text-yellow-500 dark:text-yellow-300" />
+              </div>
+              <div className="font-semibold mb-1 text-gray-900 dark:text-gray-100">Lớp chiêu sinh mở lớp</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Các lớp học mở rộng, phù hợp nhiều trình độ.</div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 flex flex-col items-center">
+              <div className="w-16 h-16 mb-3 rounded-full flex items-center justify-center bg-purple-50 dark:bg-purple-900">
+                <MessageCircle className="w-10 h-10 text-purple-500 dark:text-purple-300" />
+              </div>
+              <div className="font-semibold mb-1 text-gray-900 dark:text-gray-100">Tư vấn, định hướng giáo dục</div>
+              <div className="text-gray-600 dark:text-gray-300 text-sm text-center">Hỗ trợ phụ huynh và học sinh chọn lộ trình phù hợp.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Thư ngỏ từ trung tâm */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-900" id="letter">
+        <div className="container-custom flex flex-col md:flex-row items-center gap-8">
+          <img src="/assets/images/letter-placeholder.jpg" alt="Thư ngỏ" className="min-w-[270px] max-w-[320px] w-full h-60 object-cover rounded-lg shadow mb-4 md:mb-0" />
+          <div>
+            <h2 className="text-2xl font-bold mb-2 text-primary-700 dark:text-primary-400">Thư ngỏ từ Trung tâm</h2>
+            <p className="text-gray-700 dark:text-gray-200 text-lg mb-2">Kính gửi quý phụ huynh và học sinh,</p>
+            <p className="text-gray-700 dark:text-gray-200 text-base mb-2">Trung tâm Gia Sư Hoàng Hà xin gửi lời cảm ơn chân thành đến quý phụ huynh và học sinh đã tin tưởng, đồng hành cùng chúng tôi trong suốt thời gian qua. Chúng tôi cam kết không ngừng nâng cao chất lượng giảng dạy, lấy sự tiến bộ của học sinh làm mục tiêu hàng đầu. Rất mong tiếp tục nhận được sự ủng hộ và hợp tác của quý vị!</p>
+            <div className="mt-4 text-gray-600 dark:text-gray-300">Trân trọng,<br />Ban Giám Đốc Trung tâm Gia Sư Hoàng Hà</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="section-padding bg-white dark:bg-gray-900" aria-labelledby="gallery-heading">
         <div className="container-custom">
           <SectionHeading
-            title="Lịch sử phát triển"
-            subtitle="Từ những ngày đầu thành lập đến hiện tại"
+            title="Hình ảnh thực tế"
+            subtitle="Một số khoảnh khắc tại trung tâm và các hoạt động nổi bật"
+            id="gallery-heading"
           />
-          <div className="max-w-4xl mx-auto">
-            <p className="text-gray-700 text-lg leading-relaxed dark:text-gray-200">{centerInfo.history}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
+            {loading
+              ? Array(10).fill(0).map((_, idx) => (
+                <div key={idx} className="overflow-hidden rounded-lg shadow-md group relative">
+                  <SkeletonLoading type="banner" height="160px" />
+                </div>
+              ))
+              : [
+                'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b',
+                'https://images.unsplash.com/photo-1606326608802-164e734c2fd9',
+                'https://images.unsplash.com/photo-1606326608670-21cb955e5741',
+                'https://images.unsplash.com/photo-1645290851823-205dc9d23ea0',
+                'https://images.unsplash.com/photo-1434030216411-0b793f4b4173',
+                'https://images.unsplash.com/photo-1509062522246-3755977927d7',
+                'https://images.unsplash.com/photo-1510531704581-5b2870972060',
+                'https://images.unsplash.com/photo-1524178232363-1fb2b075b655',
+                'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4',
+                'https://images.unsplash.com/photo-1568333261345-0918efdce2d9',
+              ].map((url, idx) => (
+                <div key={url} className="overflow-hidden rounded-lg shadow-md group relative cursor-pointer" onClick={() => setPreviewImg(url)}>
+                  <img
+                    src={url + '?w=400&h=300&fit=crop'}
+                    alt={`Hình thực tế ${idx + 1}`}
+                    className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
           </div>
+          {/* Dialog preview */}
+          <Dialog open={!!previewImg} onOpenChange={open => !open && setPreviewImg(null)}>
+            <DialogContent className="max-w-3xl flex flex-col items-center">
+              {previewImg ? (
+                <img
+                  src={previewImg + '?w=900&fit=crop'}
+                  alt="Preview"
+                  className="w-full max-h-[80vh] object-contain rounded-lg"
+                  loading="lazy"
+                  onLoad={e => e.currentTarget.classList.remove('opacity-0')}
+                  style={{ transition: 'opacity 0.3s' }}
+                />
+              ) : (
+                <SkeletonLoading type="banner" height="400px" className="w-full" />
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </section>
+      {/* End Gallery Section */}
 
       {/* Team Section */}
       {tutors.length > 0 ? (
-        <section className="section-padding">
+        <section id="team" className="section-padding bg-gray-50 dark:bg-gray-900" aria-labelledby="team-heading">
           <div className="container-custom">
             <SectionHeading
               title="Đội ngũ giáo viên"
               subtitle="Đội ngũ giáo viên có trình độ chuyên môn cao, giàu kinh nghiệm và tâm huyết với nghề"
+              id="team-heading"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {tutors.map(tutor => (
@@ -163,11 +387,12 @@ const AboutPage = () => {
           </div>
         </section>
       ) : (
-        <section className="section-padding">
+        <section id="team" className="section-padding bg-gray-50 dark:bg-gray-900" aria-labelledby="team-heading">
           <div className="container-custom">
             <SectionHeading
               title="Đội ngũ giáo viên"
               subtitle="Thông tin đội ngũ giáo viên đang được cập nhật"
+              id="team-heading"
             />
             <div className="text-center py-10">
               <p className="text-gray-500 text-lg">Thông tin giáo viên sẽ được cập nhật sớm.</p>
@@ -175,48 +400,6 @@ const AboutPage = () => {
           </div>
         </section>
       )}
-
-      {/* Information Section */}
-      <section className="section-padding bg-gray-50 dark:bg-gray-900">
-        <div className="container-custom">
-          <SectionHeading title="Thông tin liên hệ" centered={false} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div>
-              <div className="mb-5">
-                <h4 className="text-lg font-semibold mb-2 dark:text-gray-200">Địa chỉ:</h4>
-                <p className="text-gray-700 dark:text-gray-200">{centerInfo.address}</p>
-              </div>
-              <div className="mb-5">
-                <h4 className="text-lg font-semibold mb-2 dark:text-gray-200">Điện thoại:</h4>
-                <p className="text-gray-700 dark:text-gray-200">{centerInfo.phone}</p>
-              </div>
-              <div className="mb-5">
-                <h4 className="text-lg font-semibold mb-2 dark:text-gray-200">Email:</h4>
-                <p className="text-gray-700 dark:text-gray-200">{centerInfo.email}</p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-2 dark:text-gray-200">Giờ làm việc:</h4>
-                <p className="text-gray-700 mb-1 dark:text-gray-200">
-                  Thứ 2 - Thứ 6: {centerInfo.workingHours.weekdays}
-                </p>
-                <p className="text-gray-700 dark:text-gray-200">Thứ 7 - Chủ nhật: {centerInfo.workingHours.weekend}</p>
-              </div>
-            </div>
-            <div className="rounded-lg overflow-hidden shadow-md">
-              <iframe
-                title="Google Maps - Gia Sư Hoàng Hà"
-                src="https://www.google.com/maps?q=265%20%C4%90%C6%B0%E1%BB%9Dng%2006%2C%20M%E1%BA%B7t%20B%E1%BA%B1ng%2008%2C%20Ph%C6%B0%E1%BB%9Dng%20Nam%20Ng%E1%BA%A1n%2C%20Th%C3%A0nh%20Ph%E1%BB%91%20Thanh%20Ho%C3%A1%2C%20T%E1%BB%89nh%20Thanh%20Ho%C3%A1&output=embed"
-                width="100%"
-                height="320"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </section>
       <Chatbot />
     </Layout>
   );

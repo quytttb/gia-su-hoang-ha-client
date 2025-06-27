@@ -12,9 +12,6 @@ export const FIXED_CATEGORIES = [
  * Handles both old and new data structures
  */
 export const convertFirestoreClass = (firestoreClass: any): Class => {
-     // Debug log to check the structure
-     console.log('Converting Firestore class:', firestoreClass);
-
      if (!firestoreClass) {
           console.error('convertFirestoreClass: firestoreClass is null or undefined');
           throw new Error('Invalid firestore class data');

@@ -38,6 +38,12 @@ service cloud.firestore {
       allow create, update, delete: if isStaff();
     }
 
+    // Classes collection
+    match /classes/{classId} {
+      allow read: if true; // Public read for class browsing
+      allow create, update, delete: if isStaff();
+    }
+
     // Registrations collection
     match /registrations/{registrationId} {
       allow read: if isStaff() || 
@@ -58,9 +64,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Contacts collection (for contact form messages)
+    match /contacts/{contactId} {
+      allow read, update, delete: if isStaff();
+      allow create: if true; // Anyone can create contact messages
+    }
+
     // Schedules collection
     match /schedules/{scheduleId} {
-      allow read: if isAuthenticated(); // Students can view schedules
+      allow read: if true; // Public read for schedule viewing
       allow create, update, delete: if isStaff();
     }
 

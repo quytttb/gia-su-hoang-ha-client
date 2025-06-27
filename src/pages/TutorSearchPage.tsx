@@ -11,17 +11,37 @@ const TutorSearchPage = () => {
 
      return (
           <Layout>
-               <div className="container-custom py-16 pb-32">
-                    <div className="max-w-5xl mx-auto">
-                         <div className="text-center mb-12">
-                              <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+               {/* Hero Section */}
+               <section
+                    className="relative flex items-center justify-center min-h-[220px] md:min-h-[260px] bg-[#e3f0ff] dark:bg-gradient-to-b dark:from-[#182848] dark:to-[#35577d] py-8 md:py-10 overflow-hidden shadow-md border-b border-blue-200 dark:border-blue-900"
+                    aria-labelledby="tutor-search-hero-heading"
+               >
+                    {/* Logo background mờ */}
+                    <img
+                         src="/images/logo.png"
+                         alt="Logo Gia Sư Hoàng Hà"
+                         className="absolute inset-0 m-auto w-[260px] h-[260px] md:w-[320px] md:h-[320px] opacity-20 dark:opacity-25 pointer-events-none select-none z-0"
+                         style={{ left: '0', right: '0', top: '0', bottom: '0', filter: 'brightness(1.15)' }}
+                    />
+                    {/* Overlay phù hợp với cả 2 mode */}
+                    <div className="absolute inset-0 bg-white/70 dark:bg-white/10 z-10"></div>
+                    <div className="container-custom relative z-20 flex flex-col items-center justify-center h-full">
+                         <div className="flex flex-col items-center justify-center h-full">
+                              <h1
+                                   id="tutor-search-hero-heading"
+                                   className="text-4xl md:text-5xl font-bold mb-4 text-primary-700 dark:text-primary-500 drop-shadow-md"
+                                   style={{ whiteSpace: 'nowrap' }}
+                              >
                                    Tìm Gia sư phù hợp
                               </h1>
-                              <p className="text-lg text-gray-600 dark:text-gray-400">
-                                   Chọn loại Gia sư phù hợp với nhu cầu học tập của bạn
+                              <p className="text-xl md:text-2xl font-semibold text-accent-600 dark:text-accent-500 max-w-4xl mx-auto mb-0" style={{ whiteSpace: 'nowrap' }}>
+                                   Bạn muốn tìm Gia sư nào? Hãy chọn bên dưới nhé!
                               </p>
                          </div>
-
+                    </div>
+               </section>
+               <div className="container-custom py-8 pb-8">
+                    <div className="max-w-5xl mx-auto">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                               {/* Gia sư giáo viên */}
                               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col">
@@ -29,7 +49,7 @@ const TutorSearchPage = () => {
                                         <div className="text-center mb-6">
                                              <div className="w-full flex justify-center mb-4">
                                                   <img
-                                                       src="/assets/images/gia-su-giao-vien.jpg"
+                                                       src="/images/gia-su-giao-vien.jpg"
                                                        alt="Gia sư Giáo viên"
                                                        className="rounded-lg object-cover max-h-40 w-auto shadow"
                                                        style={{ aspectRatio: '1.475', background: '#f3f4f6' }}
@@ -85,7 +105,7 @@ const TutorSearchPage = () => {
                                         <div className="text-center mb-6">
                                              <div className="w-full flex justify-center mb-4">
                                                   <img
-                                                       src="/assets/images/gia-su-sinh-vien.jpg"
+                                                       src="/images/gia-su-sinh-vien.jpg"
                                                        alt="Gia sư Sinh viên"
                                                        className="rounded-lg object-cover max-h-40 w-auto shadow"
                                                        style={{ aspectRatio: '1.475', background: '#f3f4f6' }}

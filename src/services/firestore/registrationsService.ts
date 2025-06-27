@@ -7,7 +7,6 @@ export interface RegistrationFilters {
      status?: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
      classId?: string;
      userId?: string;
-     paymentStatus?: 'pending' | 'partial' | 'completed' | 'refunded';
      dateRange?: { start: Date; end: Date };
 }
 
@@ -16,8 +15,6 @@ export interface RegistrationStats {
      pendingRegistrations: number;
      approvedRegistrations: number;
      rejectedRegistrations: number;
-     totalRevenue: number;
-     pendingPayments: number;
      popularCourses: { classId: string; className?: string; count: number }[];
      recentRegistrations: number;
 }
@@ -32,41 +29,46 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
           registrationData: Omit<FirestoreRegistration, 'id' | 'createdAt' | 'updatedAt'>
      ): Promise<ServiceResponse<FirestoreRegistration>> {
           try {
-               // Check if course exists and has available spots
-               const courseResult = await coursesService.getById(registrationData.classId);
-               if (!courseResult.data) {
-                    return {
-                         data: null,
-                         error: 'Khóa học không tồn tại',
-                         loading: false,
+               // Nếu là đăng ký lớp học thì kiểm tra classId như cũ
+               if (registrationData.type === 'class' && registrationData.classId) {
+                    const courseResult = await coursesService.getById(registrationData.classId);
+                    if (!courseResult.data) {
+                         return {
+                              data: null,
+                              error: 'Khóa học không tồn tại',
+                              loading: false,
+                         };
+                    }
+
+                    const course = courseResult.data;
+                    if (!course.isActive) {
+                         return {
+                              data: null,
+                              error: 'Khóa học không còn hoạt động',
+                              loading: false,
+                         };
+                    }
+
+                    // Create registration with default values cho lớp học
+                    const registration = {
+                         ...registrationData,
+                         status: 'pending' as const,
+                         paymentStatus: 'pending' as const,
+                         totalAmount: course.price,
+                         paidAmount: 0,
                     };
-               }
 
-               const course = courseResult.data;
-               if (!course.isActive) {
-                    return {
-                         data: null,
-                         error: 'Khóa học không còn hoạt động',
-                         loading: false,
+                    const result = await this.create(registration);
+                    return result;
+               } else {
+                    // Đăng ký tìm gia sư: không kiểm tra classId, chỉ lưu dữ liệu
+                    const registration = {
+                         ...registrationData,
+                         status: 'pending' as const,
                     };
+                    const result = await this.create(registration);
+                    return result;
                }
-
-               // Available spots check removed as currentStudents is no longer tracked
-
-               // Create registration with default values
-               const registration = {
-                    ...registrationData,
-                    status: 'pending' as const,
-                    paymentStatus: 'pending' as const,
-                    totalAmount: course.price,
-                    paidAmount: 0,
-               };
-
-               const result = await this.create(registration);
-
-               // Enrollment count tracking removed
-
-               return result;
           } catch (error: any) {
                console.error('Error creating registration:', error);
                return {
@@ -96,10 +98,6 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
 
                if (filters?.userId) {
                     whereClause.push({ field: 'userId', operator: '==', value: filters.userId });
-               }
-
-               if (filters?.paymentStatus) {
-                    whereClause.push({ field: 'paymentStatus', operator: '==', value: filters.paymentStatus });
                }
 
                const queryOptions: QueryOptions = {
@@ -136,12 +134,14 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
      // Approve registration
      async approveRegistration(
           registrationId: string,
-          approvedBy: string
+          approvedBy: string,
+          approvedByName?: string
      ): Promise<ServiceResponse<FirestoreRegistration>> {
           try {
                const updateData = {
                     status: 'approved' as const,
                     approvedBy,
+                    approvedByName: approvedByName || approvedBy, // Lưu tên nếu có, không thì dùng ID
                     approvedAt: serverTimestamp(),
                };
 
@@ -198,59 +198,6 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
           }
      }
 
-     // Update payment information
-     async updatePayment(
-          registrationId: string,
-          paymentData: {
-               paidAmount: number;
-               paymentMethod?: 'cash' | 'transfer' | 'card';
-               paymentStatus?: 'pending' | 'partial' | 'completed' | 'refunded';
-          }
-     ): Promise<ServiceResponse<FirestoreRegistration>> {
-          try {
-               const registrationResult = await this.getById(registrationId);
-               if (!registrationResult.data) {
-                    return {
-                         data: null,
-                         error: 'Registration not found',
-                         loading: false,
-                    };
-               }
-
-               const registration = registrationResult.data;
-               const totalAmount = registration.totalAmount || 0;
-               const newPaidAmount = paymentData.paidAmount;
-
-               // Determine payment status if not provided
-               let paymentStatus = paymentData.paymentStatus;
-               if (!paymentStatus) {
-                    if (newPaidAmount <= 0) {
-                         paymentStatus = 'pending';
-                    } else if (newPaidAmount >= totalAmount) {
-                         paymentStatus = 'completed';
-                    } else {
-                         paymentStatus = 'partial';
-                    }
-               }
-
-               const updateData = {
-                    paidAmount: newPaidAmount,
-                    paymentStatus,
-                    paymentMethod: paymentData.paymentMethod,
-                    paymentDate: serverTimestamp(),
-               };
-
-               return await this.update(registrationId, updateData);
-          } catch (error: any) {
-               console.error('Error updating payment:', error);
-               return {
-                    data: null,
-                    error: error.message || 'Failed to update payment',
-                    loading: false,
-               };
-          }
-     }
-
      // Get pending registrations
      async getPendingRegistrations(options?: QueryOptions): Promise<PaginatedResponse<FirestoreRegistration>> {
           return this.getRegistrations({ status: 'pending' }, options);
@@ -289,19 +236,12 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
                const approvedRegistrations = registrations.filter(r => r.status === 'approved').length;
                const rejectedRegistrations = registrations.filter(r => r.status === 'rejected').length;
 
-               // Calculate revenue
-               const totalRevenue = registrations
-                    .filter(r => r.paidAmount)
-                    .reduce((sum, r) => sum + (r.paidAmount || 0), 0);
-
-               const pendingPayments = registrations
-                    .filter(r => r.paymentStatus === 'pending' || r.paymentStatus === 'partial')
-                    .reduce((sum, r) => sum + ((r.totalAmount || 0) - (r.paidAmount || 0)), 0);
-
                // Popular courses
                const courseCount: { [key: string]: number } = {};
                registrations.forEach(registration => {
-                    courseCount[registration.classId] = (courseCount[registration.classId] || 0) + 1;
+                    if (registration.classId) {
+                         courseCount[registration.classId] = (courseCount[registration.classId] || 0) + 1;
+                    }
                });
 
                const popularCourses = Object.entries(courseCount)
@@ -323,8 +263,6 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
                     pendingRegistrations,
                     approvedRegistrations,
                     rejectedRegistrations,
-                    totalRevenue,
-                    pendingPayments,
                     popularCourses,
                     recentRegistrations,
                };
@@ -409,4 +347,4 @@ class RegistrationsService extends BaseFirestoreService<FirestoreRegistration> {
 
 // Export singleton instance
 export const registrationsService = new RegistrationsService();
-export default registrationsService; 
+export default registrationsService;

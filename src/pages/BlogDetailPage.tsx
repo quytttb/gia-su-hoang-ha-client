@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { getPostById, getRelatedPosts, getLatestPosts } from '../data/blogData';
+import { getPostById, getRelatedPosts, getLatestPosts } from '../constants/blogData';
 
 const BlogDetailPage: React.FC = () => {
      const { id } = useParams<{ id: string }>();

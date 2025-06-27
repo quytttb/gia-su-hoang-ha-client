@@ -115,6 +115,7 @@ export class AuthService {
 
                await signOut(auth as Auth);
           } catch (error: any) {
+               console.error('Sign out error:', error);
                throw new Error('Failed to sign out');
           }
      }

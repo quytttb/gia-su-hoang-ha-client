@@ -40,10 +40,10 @@ export function parseMarkdown(text: string): React.ReactNode[] {
                <div key={`line-${lineIndex}`}>{parts}</div>
           );
           return (
-               <>
+               <React.Fragment key={`fragment-${lineIndex}`}>
                     {content}
                     {lineIndex < lines.length - 1 && !isBulletPoint && <br />}
-               </>
+               </React.Fragment>
           );
      });
 }

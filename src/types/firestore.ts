@@ -34,24 +34,35 @@ export type FirestoreCourse = FirestoreClass;
 // Registration interface for Firestore
 export interface FirestoreRegistration extends FirestoreDocument {
      userId?: string; // Optional for guest registrations
-     classId: string;
+
+     // Registration type - NEW FIELD
+     type: 'class' | 'tutor_teacher' | 'tutor_student';
+
+     classId?: string;
+     className?: string;        // ← THÊM TRƯỜNG NÀY
+     classSchedule?: string;    // ← THÊM TRƯỜNG NÀY
      studentName: string;
      studentPhone: string;
+     studentSchool: string; // Trường học của học viên
      parentName: string;
      parentPhone: string;
-     address: string;
+     parentAddress: string; // Địa chỉ phụ huynh (đổi từ address)
      preferredSchedule: string;
-     notes?: string;
-     status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
+     notes?: string; // Mô tả lực học từ academicDescription
+     status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed' | 'matched' | 'trial_scheduled';
      approvedBy?: string; // Admin/Staff UID who approved
+     approvedByName?: string; // Tên người xử lý
      approvedAt?: Timestamp;
      rejectionReason?: string;
-     // Payment information
-     paymentStatus?: 'pending' | 'partial' | 'completed' | 'refunded';
-     paidAmount?: number;
-     totalAmount?: number;
-     paymentMethod?: 'cash' | 'transfer' | 'card';
-     paymentDate?: Timestamp;
+
+     // For tutor registrations
+     tutorType?: 'teacher' | 'student';
+     tutorCriteria?: string;
+     matchedTutorId?: string;
+     matchedTutorName?: string;
+     matchedAt?: Timestamp;
+     trialScheduledAt?: Timestamp;
+     staffNotes?: string;
 }
 
 // Inquiry interface for Firestore
@@ -146,6 +157,74 @@ export interface FirestoreSettings extends FirestoreDocument {
      lastModifiedBy: string;
 }
 
+// Tutors collection interface
+export interface FirestoreTutor extends FirestoreDocument {
+     name: string;
+     email?: string;
+     phone?: string;
+     specialty: string;
+     bio: string;
+     experience: string;
+     education: string;
+     imageUrl: string;
+     subjects: string[];
+     availability: string[];
+     isActive: boolean;
+     hourlyRate?: number;
+     rating?: number;
+     totalStudents?: number;
+}
+
+// TutorRequest interface for Firestore
+export interface FirestoreTutorRequest extends FirestoreDocument {
+     // Thông tin cơ bản
+     tutorType: 'teacher' | 'student';
+
+     // Thông tin học viên
+     studentName: string;
+     studentPhone: string;
+     studentSchool: string;
+     academicDescription?: string; // Mô tả lực học
+
+     // Thông tin phụ huynh  
+     parentName: string;
+     parentPhone: string;
+     parentAddress: string;
+
+     // Yêu cầu gia sư
+     tutorCriteria: string; // Mô tả tiêu chí tìm gia sư
+     subjects?: string[]; // Môn học cần học
+     preferredSchedule?: string; // Lịch mong muốn
+     budget?: number; // Ngân sách dự kiến
+
+     // Trạng thái xử lý
+     status: 'pending' | 'consulting' | 'searching' | 'matched' | 'trial_scheduled' | 'confirmed' | 'cancelled';
+     priority: 'high' | 'medium' | 'low';
+
+     // Xử lý bởi staff
+     assignedStaffId?: string;
+     assignedStaffName?: string;
+     staffNotes?: string;
+
+     // Ghép đôi gia sư
+     matchedTutorId?: string;
+     matchedTutorName?: string;
+     matchedAt?: Timestamp;
+
+     // Lịch dạy thử
+     trialScheduledAt?: Timestamp;
+     trialCompletedAt?: Timestamp;
+     trialFeedback?: string;
+
+     // Xác nhận chính thức
+     confirmedAt?: Timestamp;
+     contractStartDate?: Timestamp;
+
+     // Metadata
+     source: 'website' | 'phone' | 'referral'; // Nguồn yêu cầu
+     rejectionReason?: string;
+}
+
 // Collection names constants
 export const COLLECTIONS = {
      USERS: 'users',
@@ -157,10 +236,12 @@ export const COLLECTIONS = {
      ANALYTICS: 'analytics',
      USER_STATS: 'userStats',
      SETTINGS: 'settings',
+     TUTORS: 'tutors',
+     TUTOR_REQUESTS: 'tutorRequests',
 } as const;
 
 // Firestore converter helper type
 export type FirestoreConverter<T> = {
      toFirestore: (data: Partial<T>) => Record<string, any>;
      fromFirestore: (snapshot: any) => T;
-}; 
+};

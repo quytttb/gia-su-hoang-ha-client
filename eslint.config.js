@@ -6,7 +6,7 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 
 export default [
-  { ignores: ['dist', 'node_modules'] },
+  { ignores: ['dist', 'node_modules', 'scripts/**/*'] },
   // JavaScript files
   {
     files: ['**/*.{js,jsx}'],
@@ -58,6 +58,16 @@ export default [
       'no-undef': 'off', // TypeScript handles this
       '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    },
+  },
+  // UI components and contexts - allow utility exports
+  {
+    files: [
+      'src/components/ui/**/*.{ts,tsx}',
+      'src/contexts/**/*.{ts,tsx}'
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ];

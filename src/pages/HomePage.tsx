@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, Suspense, lazy } from 'react';
+import { useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import Banner from '../components/shared/Banner';
-import SectionHeading from '../components/shared/SectionHeading';
-import ClassCard from '../components/shared/ClassCard';
 import { Banner as BannerType, CenterInfo, Class } from '../types';
 import { bannerService } from '../services/bannerService';
 import classesService from '../services/firestore/classesService';
 import settingsService from '../services/firestore/settingsService';
 import { updateSEO, seoData } from '../utils/seo';
 import { convertFirestoreClass, getFeaturedClasses } from '../utils/classHelpers';
-import Chatbot from '../components/shared/Chatbot';
 import ErrorDisplay from '../components/shared/ErrorDisplay';
 import BlogSection from '../components/home/BlogSection';
+import BannerSection from '../components/home/BannerSection';
+import IntroductionSection from '../components/home/IntroductionSection';
+import FeaturedClassesSection from '../components/home/FeaturedClassesSection';
+import ContactCTASection from '../components/home/ContactCTASection';
+import ParentFeedbackSection from '../components/home/ParentFeedbackSection';
+
+const Chatbot = lazy(() => import('../components/shared/Chatbot'));
 
 const HomePage = () => {
   const [banners, setBanners] = useState<BannerType[]>([]);
@@ -20,6 +23,29 @@ const HomePage = () => {
   const [featuredClasses, setFeaturedClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
+
+  // Function to scroll to section
+  const scrollToSection = (sectionId: string) => {
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      }
+    }, 100);
+  };
+
+  // Handle scroll to section when page loads with hash
+  useEffect(() => {
+    if (location.hash && !loading) {
+      const sectionId = location.hash.replace('#', '');
+      scrollToSection(sectionId);
+    }
+  }, [location.hash, loading]);
 
   useEffect(() => {
     // Update SEO for homepage
@@ -30,12 +56,12 @@ const HomePage = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch banners from Firestore
-        const bannersResult = await bannerService.getActiveBanners();
+        // Fetch banners và center info song song
+        const [bannersResult, centerInfoResult] = await Promise.all([
+          bannerService.getActiveBanners(),
+          settingsService.getCenterInfo(),
+        ]);
         setBanners(bannersResult);
-
-        // Fetch center info from Firestore
-        const centerInfoResult = await settingsService.getCenterInfo();
         setCenterInfo(centerInfoResult);
 
         setLoading(false);
@@ -69,9 +95,27 @@ const HomePage = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
+        <BannerSection banners={[]} loading />
+        <IntroductionSection
+          centerInfo={{
+            id: '',
+            name: '',
+            description: '',
+            address: '',
+            phone: '',
+            email: '',
+            history: '',
+            mission: '',
+            vision: '',
+            slogan: '',
+            workingHours: { weekdays: '', weekend: '' }
+          }}
+          loading
+        />
+        <FeaturedClassesSection featuredClasses={[]} loading />
+        <div className="section-padding" />
+        <ContactCTASection />
+        <ParentFeedbackSection loading />
       </Layout>
     );
   }
@@ -90,89 +134,27 @@ const HomePage = () => {
 
   return (
     <Layout>
-      {/* Banner Section */}
-      <section>
-        <Banner banners={banners} />
-      </section>
-
-      {/* Introduction Section */}
-      {centerInfo && (
-        <section className="section-padding bg-gray-50 dark:bg-gray-900">
-          <div className="container-custom">
-            <SectionHeading
-              title="Về Trung Tâm Gia Sư Hoàng Hà"
-              subtitle="Đồng hành cùng sự phát triển của thế hệ trẻ"
-            />
-
-            <div className="max-w-4xl mx-auto">
-              <p className="text-gray-700 dark:text-gray-300 mb-6 text-center">{centerInfo.description}</p>
-
-              <div className="flex justify-center">
-                <Link to="/about" className="btn-accent">
-                  Tìm hiểu thêm
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Featured Classes Section */}
-      <section className="section-padding bg-white dark:bg-gray-800">
-        <div className="container-custom">
-          <SectionHeading
-            title="Lớp Học Nổi Bật"
-            subtitle="Các lớp học được nhiều học viên lựa chọn và đánh giá cao"
-          />
-
-          {featuredClasses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredClasses.map(classData => (
-                <ClassCard key={classData.id} class={classData} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-10">
-              <p className="text-gray-500 text-lg">Chưa có lớp học nào được đăng.</p>
-            </div>
-          )}
-
-          <div className="mt-12 text-center">
-            <Link to="/classes" className="btn-primary">
-              Xem tất cả lớp học
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Blog Section */}
-      <BlogSection />
-
-      {/* Contact CTA Section */}
-      <section className="section-padding bg-primary text-white dark:bg-primary-700">
-        <div className="container-custom text-center">
-          <h2 className="text-3xl font-bold mb-4">Bạn cần tư vấn về lớp học?</h2>
-          <p className="mb-8 max-w-2xl mx-auto text-white dark:text-gray-200">
-            Hãy liên hệ với chúng tôi ngay hôm nay để được tư vấn miễn phí về các lớp học phù hợp
-            nhất với nhu cầu của bạn hoặc con em của bạn.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              to="/contact"
-              className="bg-accent text-white px-6 py-3 rounded-lg font-medium hover:bg-accent-600 dark:hover:bg-accent-400 transition-colors"
-            >
-              Liên hệ ngay
-            </Link>
-            <Link
-              to="/classes"
-              className="border border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-primary dark:hover:bg-gray-900 dark:hover:text-white transition-colors"
-            >
-              Xem lớp học
-            </Link>
-          </div>
-        </div>
-      </section>
-      <Chatbot />
+      <div id="banner">
+        <BannerSection banners={banners} />
+      </div>
+      <div id="introduction">
+        {centerInfo && <IntroductionSection centerInfo={centerInfo} />}
+      </div>
+      <div id="featured-classes">
+        <FeaturedClassesSection featuredClasses={featuredClasses} />
+      </div>
+      <div id="blog">
+        <BlogSection />
+      </div>
+      <div id="feedback">
+        <ParentFeedbackSection />
+      </div>
+      <div id="contact">
+        <ContactCTASection />
+      </div>
+      <Suspense fallback={null}>
+        <Chatbot />
+      </Suspense>
     </Layout>
   );
 };

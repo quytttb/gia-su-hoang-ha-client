@@ -60,13 +60,14 @@ export interface Schedule {
   id: string;
   classId: string;
   className: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  tutor: string;
-  room: string;
-  maxStudents?: number;
-  studentPhones: string[];
+  startDate: string; // Ngày khai giảng lớp học (ISO string)
+  startTime: string; // Giờ bắt đầu (VD: "08:00")
+  endTime: string; // Giờ kết thúc (VD: "10:00") 
+  tutorId: string; // ID tham chiếu đến collection tutors
+  tutorName: string; // Tên giáo viên (denormalized)
+  maxStudents: number; // Cố định 12
+  studentPhones: string[]; // Danh sách SĐT học viên
+  status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled'; // Trạng thái lớp học
   studentIds?: string[];
 }
 
@@ -82,11 +83,44 @@ export interface User {
 
 export interface Registration {
   id: string;
-  userId: string;
-  classId: string;
+  userId?: string; // Optional for guest registrations
+
+  // Registration type - NEW FIELD
+  type: 'class' | 'tutor_teacher' | 'tutor_student';
+
+  // For class registrations
+  classId?: string;
+  className?: string;
+
+  // For tutor registrations - NEW FIELDS
+  tutorType?: 'teacher' | 'student';
+  tutorCriteria?: string; // Mô tả tiêu chí tìm gia sư
+
+  // Common fields
+  studentName: string;
+  studentPhone: string;
+  studentSchool: string; // Trường học của học viên
+  parentName: string;
+  parentPhone: string;
+  parentAddress: string; // Địa chỉ phụ huynh (đổi từ address)
+  preferredSchedule: string;
+  notes?: string; // Mô tả lực học từ academicDescription
   registrationDate: string;
-  status: 'pending' | 'approved' | 'cancelled';
-  paymentStatus: 'pending' | 'completed';
+
+  // Enhanced status for tutor requests
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed' | 'matched' | 'trial_scheduled';
+
+  approvedBy?: string;
+  approvedByName?: string; // Tên người xử lý
+  approvedAt?: string;
+  rejectionReason?: string;
+
+  // Tutor matching fields - NEW FIELDS
+  matchedTutorId?: string;
+  matchedTutorName?: string;
+  matchedAt?: string;
+  trialScheduledAt?: string;
+  staffNotes?: string;
 }
 
 export interface Inquiry {

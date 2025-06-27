@@ -11,6 +11,7 @@ import {
      onSnapshot,
      Timestamp,
      Firestore,
+     writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Schedule } from '../../types';
@@ -19,16 +20,16 @@ const COLLECTION_NAME = 'schedules';
 
 export interface FirestoreSchedule {
      id: string;
-     courseId: string;
-     tutorId: string;
-     date: string;
-     startTime: string;
-     endTime: string;
-     room: string;
-     status: 'scheduled' | 'completed' | 'cancelled';
-     maxStudents?: number;
-     studentPhones?: string[];
-     tutor?: string;
+     classId: string;
+     className: string;
+     startDate: Timestamp; // Ngày khai giảng lớp học
+     startTime: string; // Giờ bắt đầu (VD: "08:00")
+     endTime: string; // Giờ kết thúc (VD: "10:00")
+     tutorId: string; // ID tham chiếu đến collection tutors
+     tutorName: string; // Tên giáo viên (denormalized)
+     maxStudents: number; // Cố định 12
+     studentPhones: string[]; // Danh sách SĐT học viên
+     status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled'; // Trạng thái lớp học
      notes?: string;
      createdAt: Timestamp;
      updatedAt: Timestamp;
@@ -38,15 +39,16 @@ export interface FirestoreSchedule {
 const convertFromFirestore = (firestoreSchedule: FirestoreSchedule): Schedule => {
      return {
           id: firestoreSchedule.id,
-          classId: firestoreSchedule.courseId,
-          className: '', // Will be populated by joining with course data
-          date: firestoreSchedule.date,
+          classId: firestoreSchedule.classId,
+          className: firestoreSchedule.className || '',
+          startDate: firestoreSchedule.startDate ? firestoreSchedule.startDate.toDate().toISOString().split('T')[0] : '',
           startTime: firestoreSchedule.startTime,
           endTime: firestoreSchedule.endTime,
-          tutor: firestoreSchedule.tutor || '', // Use stored tutor name or empty
-          room: firestoreSchedule.room,
-          maxStudents: firestoreSchedule.maxStudents,
+          tutorId: firestoreSchedule.tutorId || '',
+          tutorName: firestoreSchedule.tutorName || '',
+          maxStudents: firestoreSchedule.maxStudents || 12,
           studentPhones: firestoreSchedule.studentPhones || [],
+          status: firestoreSchedule.status || 'scheduled',
      };
 };
 
@@ -68,8 +70,8 @@ class SchedulesService {
 
                // Sort in memory
                return schedules.sort((a, b) => {
-                    if (a.date !== b.date) {
-                         return a.date.localeCompare(b.date);
+                    if (a.startDate !== b.startDate) {
+                         return a.startDate.localeCompare(b.startDate);
                     }
                     return a.startTime.localeCompare(b.startTime);
                });
@@ -112,7 +114,7 @@ class SchedulesService {
 
                const q = query(
                     collection(db as Firestore, COLLECTION_NAME),
-                    where('date', '==', date)
+                    where('startDate', '==', Timestamp.fromDate(new Date(date)))
                );
                const querySnapshot = await getDocs(q);
 
@@ -129,18 +131,28 @@ class SchedulesService {
           }
      }
 
-     async getByCourseId(courseId: string): Promise<Schedule[]> {
+     async getByClassId(classId: string): Promise<Schedule[]> {
           try {
                if (!db) {
                     console.error('Firestore not initialized');
                     return [];
                }
 
-               const q = query(
+               // Try classId first, fallback to courseId for backward compatibility
+               let q = query(
                     collection(db as Firestore, COLLECTION_NAME),
-                    where('courseId', '==', courseId)
+                    where('classId', '==', classId)
                );
-               const querySnapshot = await getDocs(q);
+               let querySnapshot = await getDocs(q);
+
+               // If no results with classId, try courseId for backward compatibility
+               if (querySnapshot.empty) {
+                    q = query(
+                         collection(db as Firestore, COLLECTION_NAME),
+                         where('courseId', '==', classId)
+                    );
+                    querySnapshot = await getDocs(q);
+               }
 
                const schedules = querySnapshot.docs.map(doc => {
                     const data = doc.data() as Omit<FirestoreSchedule, 'id'>;
@@ -149,8 +161,8 @@ class SchedulesService {
 
                // Sort by date then start time in memory
                return schedules.sort((a, b) => {
-                    if (a.date !== b.date) {
-                         return a.date.localeCompare(b.date);
+                    if (a.startDate !== b.startDate) {
+                         return a.startDate.localeCompare(b.startDate);
                     }
                     return a.startTime.localeCompare(b.startTime);
                });
@@ -180,8 +192,8 @@ class SchedulesService {
 
                // Sort by date then start time in memory
                return schedules.sort((a, b) => {
-                    if (a.date !== b.date) {
-                         return a.date.localeCompare(b.date);
+                    if (a.startDate !== b.startDate) {
+                         return a.startDate.localeCompare(b.startDate);
                     }
                     return a.startTime.localeCompare(b.startTime);
                });
@@ -202,8 +214,8 @@ class SchedulesService {
 
                const dates = querySnapshot.docs.map(doc => {
                     const data = doc.data() as Omit<FirestoreSchedule, 'id'>;
-                    return data.date;
-               });
+                    return data.startDate ? data.startDate.toDate().toISOString().split('T')[0] : '';
+               }).filter(date => date !== '');
 
                // Return unique dates sorted
                return Array.from(new Set(dates)).sort();
@@ -229,8 +241,8 @@ class SchedulesService {
 
                // Sort in memory
                const sortedSchedules = schedules.sort((a, b) => {
-                    if (a.date !== b.date) {
-                         return a.date.localeCompare(b.date);
+                    if (a.startDate !== b.startDate) {
+                         return a.startDate.localeCompare(b.startDate);
                     }
                     return a.startTime.localeCompare(b.startTime);
                });
@@ -273,10 +285,10 @@ class SchedulesService {
           });
      }
 
-     async create(scheduleData: Omit<FirestoreSchedule, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+     async create(scheduleData: Omit<FirestoreSchedule, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ data: FirestoreSchedule | null; error: string | null }> {
           try {
                if (!db) {
-                    throw new Error('Firestore not initialized');
+                    return { data: null, error: 'Firestore not initialized' };
                }
 
                const now = Timestamp.now();
@@ -285,17 +297,28 @@ class SchedulesService {
                     createdAt: now,
                     updatedAt: now,
                });
-               return docRef.id;
+
+               // Get the created document
+               const docSnap = await getDoc(docRef);
+               if (docSnap.exists()) {
+                    const data = docSnap.data() as Omit<FirestoreSchedule, 'id'>;
+                    return {
+                         data: { id: docSnap.id, ...data },
+                         error: null
+                    };
+               }
+
+               return { data: null, error: 'Không thể tạo lịch học mới' };
           } catch (error) {
                console.error('Error creating schedule:', error);
-               throw new Error('Không thể tạo lịch học mới');
+               return { data: null, error: 'Không thể tạo lịch học mới' };
           }
      }
 
-     async update(id: string, updates: Partial<Omit<FirestoreSchedule, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> {
+     async update(id: string, updates: Partial<Omit<FirestoreSchedule, 'id' | 'createdAt' | 'updatedAt'>>): Promise<{ data: FirestoreSchedule | null; error: string | null }> {
           try {
                if (!db) {
-                    throw new Error('Firestore not initialized');
+                    return { data: null, error: 'Firestore not initialized' };
                }
 
                const docRef = doc(db as Firestore, COLLECTION_NAME, id);
@@ -303,27 +326,179 @@ class SchedulesService {
                     ...updates,
                     updatedAt: Timestamp.now()
                });
+
+               // Get the updated document
+               const docSnap = await getDoc(docRef);
+               if (docSnap.exists()) {
+                    const data = docSnap.data() as Omit<FirestoreSchedule, 'id'>;
+                    return {
+                         data: { id: docSnap.id, ...data },
+                         error: null
+                    };
+               }
+
+               return { data: null, error: 'Không thể cập nhật lịch học' };
           } catch (error) {
                console.error('Error updating schedule:', error);
-               throw new Error('Không thể cập nhật lịch học');
+               return { data: null, error: 'Không thể cập nhật lịch học' };
           }
      }
 
-     async delete(id: string): Promise<void> {
+     async delete(id: string): Promise<{ error: string | null }> {
+          try {
+               if (!db) {
+                    return { error: 'Firestore not initialized' };
+               }
+
+               const docRef = doc(db as Firestore, COLLECTION_NAME, id);
+               await deleteDoc(docRef);
+               return { error: null };
+          } catch (error) {
+               console.error('Error deleting schedule:', error);
+               return { error: 'Không thể xóa lịch học' };
+          }
+     }
+
+     // Backward compatibility alias
+     async getByCourseId(courseId: string): Promise<Schedule[]> {
+          return this.getByClassId(courseId);
+     }
+}
+
+// Utility functions để đồng bộ dữ liệu denormalized
+class DataSyncUtils {
+     // Cập nhật className trong tất cả schedules khi class name thay đổi
+     static async updateClassNameInSchedules(classId: string, newClassName: string): Promise<void> {
           try {
                if (!db) {
                     throw new Error('Firestore not initialized');
                }
 
-               const docRef = doc(db as Firestore, COLLECTION_NAME, id);
-               await deleteDoc(docRef);
+               // Tìm tất cả schedules có classId này
+               const q = query(
+                    collection(db as Firestore, COLLECTION_NAME),
+                    where('classId', '==', classId)
+               );
+
+               const querySnapshot = await getDocs(q);
+
+               // Batch update để cập nhật hiệu quả
+               const batch = writeBatch(db as Firestore);
+
+               querySnapshot.forEach((docSnap) => {
+                    batch.update(docSnap.ref, {
+                         className: newClassName,
+                         updatedAt: new Date()
+                    });
+               });
+
+               await batch.commit();
+               console.log(`✅ Updated className to "${newClassName}" for ${querySnapshot.size} schedules`);
           } catch (error) {
-               console.error('Error deleting schedule:', error);
-               throw new Error('Không thể xóa lịch học');
+               console.error('Error updating className in schedules:', error);
+               throw error;
+          }
+     }
+
+     // Cập nhật tutorName trong tất cả schedules khi tutor name thay đổi
+     static async updateTutorNameInSchedules(tutorId: string, newTutorName: string): Promise<void> {
+          try {
+               if (!db) {
+                    throw new Error('Firestore not initialized');
+               }
+
+               // Tìm tất cả schedules có tutorId này
+               const q = query(
+                    collection(db as Firestore, COLLECTION_NAME),
+                    where('tutorId', '==', tutorId)
+               );
+
+               const querySnapshot = await getDocs(q);
+
+               // Batch update để cập nhật hiệu quả
+               const batch = writeBatch(db as Firestore);
+
+               querySnapshot.forEach((docSnap) => {
+                    batch.update(docSnap.ref, {
+                         tutorName: newTutorName,
+                         updatedAt: new Date()
+                    });
+               });
+
+               await batch.commit();
+               console.log(`✅ Updated tutorName to "${newTutorName}" for ${querySnapshot.size} schedules`);
+          } catch (error) {
+               console.error('Error updating tutorName in schedules:', error);
+               throw error;
+          }
+     }
+
+     // Kiểm tra và sửa chữa dữ liệu không nhất quán
+     static async validateAndFixInconsistentData(): Promise<void> {
+          try {
+               console.log('🔍 Checking for inconsistent data in schedules...');
+
+               // Tải tất cả schedules
+               const schedulesSnapshot = await getDocs(collection(db as Firestore, COLLECTION_NAME));
+
+               // Tải tất cả classes và tutors để so sánh
+               const classesSnapshot = await getDocs(collection(db as Firestore, 'classes'));
+               const tutorsSnapshot = await getDocs(collection(db as Firestore, 'tutors'));
+
+               const classesMap = new Map();
+               const tutorsMap = new Map();
+
+               classesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    classesMap.set(doc.id, data.name || data.title || '');
+               });
+
+               tutorsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    tutorsMap.set(doc.id, data.name || '');
+               });
+
+               const batch = writeBatch(db as Firestore);
+               let fixCount = 0;
+
+               schedulesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const updates: any = {};
+
+                    // Kiểm tra className
+                    const correctClassName = classesMap.get(data.classId);
+                    if (correctClassName && data.className !== correctClassName) {
+                         updates.className = correctClassName;
+                         fixCount++;
+                    }
+
+                    // Kiểm tra tutorName
+                    const correctTutorName = tutorsMap.get(data.tutorId);
+                    if (correctTutorName && data.tutorName !== correctTutorName) {
+                         updates.tutorName = correctTutorName;
+                         fixCount++;
+                    }
+
+                    if (Object.keys(updates).length > 0) {
+                         updates.updatedAt = new Date();
+                         batch.update(doc.ref, updates);
+                    }
+               });
+
+               if (fixCount > 0) {
+                    await batch.commit();
+                    console.log(`✅ Fixed ${fixCount} inconsistent data entries`);
+               } else {
+                    console.log('✅ No inconsistent data found');
+               }
+          } catch (error) {
+               console.error('Error validating data:', error);
+               throw error;
           }
      }
 }
 
-// Export singleton instance
+// Export singleton instance and utilities
 const schedulesService = new SchedulesService();
-export default schedulesService;                                                                                                                                
+export default schedulesService;
+export { DataSyncUtils };

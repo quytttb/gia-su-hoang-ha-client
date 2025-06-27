@@ -32,7 +32,7 @@ const CourseDetailPage = () => {
 
         // Get course from Firestore
         const courseResult = await classesService.getById(id);
-        const schedulesData = await schedulesService.getByCourseId(id);
+        const schedulesData = await schedulesService.getByClassId(id);
 
         if (courseResult.data) {
           setCourse(convertFirestoreClass(courseResult.data));
@@ -46,6 +46,11 @@ const CourseDetailPage = () => {
     };
 
     fetchData();
+  }, [id]);
+
+  // Scroll to top when component mounts or id changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
 
   if (loading) {
@@ -100,9 +105,15 @@ const CourseDetailPage = () => {
               </div>
 
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <div className="mb-4">
+                <div className="mb-4 space-y-2">
                   <p className="text-gray-700 dark:text-gray-200">
-                    <strong>Lịch học:</strong> {course.schedule}
+                    <strong>Lịch học:</strong> thứ 2 đến 4
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-200">
+                    <strong>Giờ học:</strong> 19:30 đến 21:30
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-200">
+                    <strong>Số lượng:</strong> 12
                   </p>
                 </div>
 
@@ -131,6 +142,14 @@ const CourseDetailPage = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Registration Button */}
+                <Link
+                  to={`/classes/${course.id}/register`}
+                  className="btn-primary w-full text-center inline-block"
+                >
+                  Đăng ký lớp học
+                </Link>
               </div>
             </div>
 
@@ -162,16 +181,14 @@ const CourseDetailPage = () => {
                     <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Ngày học</th>
                     <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Thời gian</th>
                     <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Giáo viên</th>
-                    <th className="py-3 px-4 text-left text-gray-800 dark:text-gray-200">Phòng</th>
                   </tr>
                 </thead>
                 <tbody>
                   {schedules.map(schedule => (
                     <tr key={schedule.id} className="border-t border-gray-200 dark:border-gray-700">
-                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{formatDate(schedule.date)}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{formatDate(schedule.startDate)}</td>
                       <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.startTime} - {schedule.endTime}</td>
-                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.tutor}</td>
-                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.room}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-200">{schedule.tutorName}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -183,21 +200,6 @@ const CourseDetailPage = () => {
 
       {/* Related Courses - would be implemented in a real app */}
 
-      {/* Registration CTA */}
-      <section className="pt-4 pb-12 bg-primary text-white">
-        <div className="container-custom text-center">
-          <h2 className="text-3xl font-bold mb-4">Sẵn sàng để bắt đầu hành trình học tập?</h2>
-          <p className="mb-8 max-w-2xl mx-auto">
-            Đăng ký ngay hôm nay để được học với đội ngũ giáo viên chất lượng cao của chúng tôi.
-          </p>
-          <Link
-            to={`/classes/${course.id}/register`}
-            className="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors inline-block dark:bg-gray-700 dark:text-gray-200"
-          >
-            Đăng ký lớp học
-          </Link>
-        </div>
-      </section>
       <Chatbot />
     </Layout>
   );

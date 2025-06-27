@@ -2,9 +2,11 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import Loading from './components/shared/Loading';
 import AnalyticsTracker from './components/shared/AnalyticsTracker';
-import ScrollToTop from './components/common/ScrollToTop';
+import ScrollToTop from './components/shared/ScrollToTop';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Lazy load pages for better performance
@@ -19,129 +21,137 @@ const SchedulePage = lazy(() => import('./pages/SchedulePage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const BlogDetailPage = lazy(() => import('./pages/BlogDetailPage'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
+const PanelPage = lazy(() => import('./pages/PanelPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const TestPage = lazy(() => import('./pages/Test'));
 const TestErrorPage = lazy(() => import('./pages/TestError'));
 
-// Admin pages
-const AdminClassesPage = lazy(() => import('./pages/admin/AdminClassesPage'));
-const AdminSchedulesPage = lazy(() => import('./pages/admin/AdminSchedulesPage'));
-const AdminRegistrationsPage = lazy(() => import('./pages/admin/AdminRegistrationsPage'));
-const AdminInquiriesPage = lazy(() => import('./pages/admin/AdminInquiriesPage'));
-const AdminBannersPage = lazy(() => import('./pages/admin/AdminBannersPage'));
-const AdminStaffPage = lazy(() => import('./pages/admin/AdminStaffPage'));
-const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
-const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
-const AdminTutorsPage = lazy(() => import('./pages/admin/AdminTutorsPage'));
+// Panel pages
+const PanelClassesPage = lazy(() => import('./pages/panel/ClassesPage'));
+const PanelSchedulesPage = lazy(() => import('./pages/panel/SchedulesPage'));
+const PanelRegistrationsPage = lazy(() => import('./pages/panel/RegistrationsPage'));
+const PanelInquiriesPage = lazy(() => import('./pages/panel/InquiriesPage'));
+const PanelBannersPage = lazy(() => import('./pages/panel/BannersPage'));
+const PanelStaffPage = lazy(() => import('./pages/panel/StaffPage'));
+const PanelAnalyticsPage = lazy(() => import('./pages/panel/AnalyticsPage'));
+const PanelSettingsPage = lazy(() => import('./pages/panel/SettingsPage'));
+const PanelTutorsPage = lazy(() => import('./pages/panel/TutorsPage'));
+
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const App = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <AnalyticsTracker />
-          <Suspense fallback={<Loading message="Đang tải trang..." />}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/classes" element={<ClassesPage />} />
-              <Route path="/classes/:id" element={<ClassDetailPage />} />
-              <Route path="/classes/:id/register" element={<ClassRegistrationPage />} />
-              <Route path="/tutor-search" element={<TutorSearchPage />} />
-              <Route path="/tutor-search/register" element={<TutorRegistrationPage />} />
-              <Route path="/schedule" element={<SchedulePage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/blog/:id" element={<BlogDetailPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/test" element={<TestPage />} />
-              <Route path="/test-error" element={<TestErrorPage />} />
-              {/* Panel Routes */}
-              <Route
-                path="/panel"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/classes"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminClassesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/schedules"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminSchedulesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/registrations"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminRegistrationsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/inquiries"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminInquiriesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/banners"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminBannersPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/staff"
-                element={
-                  <ProtectedRoute requiredRoles={['admin']}>
-                    <AdminStaffPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/analytics"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminAnalyticsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/settings"
-                element={
-                  <ProtectedRoute requiredRoles={['admin']}>
-                    <AdminSettingsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/panel/tutors"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'staff']}>
-                    <AdminTutorsPage />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
+        <NotificationProvider>
+          <ToastProvider>
+            <BrowserRouter>
+              <ScrollToTop />
+              <AnalyticsTracker />
+              <Suspense fallback={<Loading message="Đang tải trang..." />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/classes" element={<ClassesPage />} />
+                  <Route path="/classes/:id" element={<ClassDetailPage />} />
+                  <Route path="/classes/:id/register" element={<ClassRegistrationPage />} />
+                  <Route path="/tutor-search" element={<TutorSearchPage />} />
+                  <Route path="/tutor-search/register" element={<TutorRegistrationPage />} />
+                  <Route path="/schedule" element={<SchedulePage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/blog" element={<BlogPage />} />
+                  <Route path="/blog/:id" element={<BlogDetailPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/test" element={<TestPage />} />
+                  <Route path="/test-error" element={<TestErrorPage />} />
+                  {/* Panel Routes */}
+                  <Route
+                    path="/panel"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/classes"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelClassesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/schedules"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelSchedulesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/registrations"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelRegistrationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/inquiries"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelInquiriesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/banners"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelBannersPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/staff"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <PanelStaffPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/analytics"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelAnalyticsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/settings"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <PanelSettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/tutors"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelTutorsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Catch all route for 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </ToastProvider>
+        </NotificationProvider>
       </AuthProvider>
     </ThemeProvider>
   );

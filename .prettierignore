@@ -13,6 +13,11 @@ build/
 package-lock.json
 yarn.lock
 
+# Tools and docs
+tools/
+docs/
+scripts/
+
 # IDE files
 .vscode/
 .idea/
@@ -25,4 +30,4 @@ Thumbs.db
 *.log
 
 # Environment files
-.env* 
+.env*

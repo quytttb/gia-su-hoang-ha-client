@@ -1,6 +1,6 @@
 import { useTheme } from '../contexts/ThemeContext';
 import Logo from '../components/shared/Logo';
-import UploadServiceStatus from '../components/admin/UploadServiceStatus';
+import UploadServiceStatus from '../components/panel/UploadServiceStatus';
 
 const Test = () => {
      const { theme, resolvedTheme } = useTheme();

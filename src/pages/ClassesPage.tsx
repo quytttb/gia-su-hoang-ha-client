@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
-import SectionHeading from '../components/shared/SectionHeading';
 import ClassCard from '../components/shared/ClassCard';
 import { Class } from '../types';
 import classesService from '../services/firestore/classesService';
@@ -8,6 +7,7 @@ import { updateSEO, seoData } from '../utils/seo';
 import { convertFirestoreClass, extractClassCategories, filterClassesByCategory } from '../utils/classHelpers';
 import Chatbot from '../components/shared/Chatbot';
 import ErrorDisplay from '../components/shared/ErrorDisplay';
+import SkeletonLoading from '../components/shared/SkeletonLoading';
 
 const ClassesPage = () => {
   const [classes, setClasses] = useState<Class[]>([]);
@@ -63,9 +63,31 @@ const ClassesPage = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
+        <section className="bg-gray-100 dark:bg-gray-900 py-16">
+          <div className="container-custom text-center">
+            <SkeletonLoading type="text" count={2} className="mx-auto" />
+          </div>
+        </section>
+
+        <section className="section-padding">
+          <div className="container-custom">
+            <div className="mb-8 text-center">
+              <SkeletonLoading type="text" count={2} className="mx-auto" />
+            </div>
+
+            <div className="mb-10">
+              <div className="flex flex-wrap justify-center gap-3 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <SkeletonLoading key={i} type="button" width="80px" />
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <SkeletonLoading type="card" count={6} />
+            </div>
+          </div>
+        </section>
       </Layout>
     );
   }
@@ -85,37 +107,44 @@ const ClassesPage = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gray-100 dark:bg-gray-900 py-16">
-        <div className="container-custom text-center">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">Lớp Học</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-6">
-            Khám phá các lớp học chất lượng cao, được thiết kế phù hợp với mọi lứa tuổi và nhu cầu
-            học tập
-          </p>
-          <div className="flex justify-center gap-8 text-sm text-gray-500 dark:text-gray-400">
-            <div>
-              <span className="font-semibold text-primary">{classes.length}</span> lớp học
-            </div>
+      <section
+        className="relative flex items-center justify-center min-h-[220px] md:min-h-[260px] bg-[#e3f0ff] dark:bg-gradient-to-b dark:from-[#182848] dark:to-[#35577d] py-8 md:py-10 overflow-hidden shadow-md border-b border-blue-200 dark:border-blue-900"
+        aria-labelledby="classes-hero-heading"
+      >
+        {/* Logo background mờ */}
+        <img
+          src="/images/logo.png"
+          alt="Logo Gia Sư Hoàng Hà"
+          className="absolute inset-0 m-auto w-[260px] h-[260px] md:w-[320px] md:h-[320px] opacity-20 dark:opacity-25 pointer-events-none select-none z-0"
+          style={{ left: '0', right: '0', top: '0', bottom: '0', filter: 'brightness(1.15)' }}
+        />
+        {/* Overlay phù hợp với cả 2 mode */}
+        <div className="absolute inset-0 bg-white/70 dark:bg-white/10 z-10"></div>
+        <div className="container-custom relative z-20 flex flex-col items-center justify-center h-full">
+          <div className="flex flex-col items-center justify-center h-full">
+            <h1
+              id="classes-hero-heading"
+              className="text-4xl md:text-5xl font-bold mb-4 text-primary-700 dark:text-primary-500 drop-shadow-md"
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              Lớp Học
+            </h1>
+            <p className="text-xl md:text-2xl font-semibold text-accent-600 dark:text-accent-500 max-w-4xl mx-auto mb-0 flex flex-col items-center gap-2" style={{ whiteSpace: 'nowrap' }}>
+              Khám phá các lớp học chất lượng cao, được thiết kế phù hợp với mọi lứa tuổi và nhu cầu học tập
+              <span className="block text-base font-medium text-primary-700 dark:text-primary-400 mt-1" style={{ whiteSpace: 'normal', letterSpacing: 0 }}>
+                {classes.length} lớp học đang mở
+              </span>
+            </p>
           </div>
         </div>
       </section>
-
-      {/* Classes Section */}
-      <section className="section-padding">
+      <section className="section-padding" aria-labelledby="classes-list-heading">
         <div className="container-custom">
-          <SectionHeading
-            title="Lớp Học"
-            subtitle="Các lớp học được quản lý và cập nhật thường xuyên"
-          />
-
           <div className="mb-10">
             <div className="flex flex-wrap justify-center gap-3 mb-6">
               <button
                 onClick={() => handleCategoryChange('all')}
-                className={`px-4 py-2 rounded-md ${selectedCategory === 'all'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-200 text-gray-700 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700'
-                  } transition-colors`}
+                className={`btn-class-filter${selectedCategory === 'all' ? ' btn-class-filter-active' : ''}`}
               >
                 Tất cả
               </button>
@@ -124,10 +153,7 @@ const ClassesPage = () => {
                 <button
                   key={category}
                   onClick={() => handleCategoryChange(category)}
-                  className={`px-4 py-2 rounded-md ${selectedCategory === category
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-200 text-gray-700 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700'
-                    } transition-colors`}
+                  className={`btn-class-filter${selectedCategory === category ? ' btn-class-filter-active' : ''}`}
                 >
                   {category}
                 </button>

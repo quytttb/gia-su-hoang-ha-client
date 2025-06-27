@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
      useEffect(() => {
           clearError();
           setLocalError(null);
-     }, [credentials.email, credentials.password]);
+     }, [credentials.email, credentials.password, clearError]);
 
      const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           const { name, value } = e.target;
@@ -76,7 +76,7 @@ const LoginPage: React.FC = () => {
      const displayError = localError || error;
 
      return (
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
                <div className="max-w-md w-full space-y-8">
                     {/* Header */}
                     <div className="text-center">
@@ -85,24 +85,24 @@ const LoginPage: React.FC = () => {
                                    Gia Sư Hoàng Hà
                               </h1>
                          </Link>
-                         <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                               Đăng nhập hệ thống
                          </h2>
-                         <p className="text-gray-600">
+                         <p className="text-gray-600 dark:text-gray-400">
                               Dành cho nhân viên và quản trị viên
                          </p>
                     </div>
 
                     {/* Login Form */}
-                    <div className="bg-white rounded-lg shadow-lg p-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
                          <form onSubmit={handleSubmit} className="space-y-6">
                               {/* Error Message */}
                               {displayError && (
-                                   <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
                                         <div className="flex">
                                              <div className="flex-shrink-0">
                                                   <svg
-                                                       className="h-5 w-5 text-red-400"
+                                                       className="h-5 w-5 text-red-400 dark:text-red-500"
                                                        viewBox="0 0 20 20"
                                                        fill="currentColor"
                                                   >
@@ -114,7 +114,7 @@ const LoginPage: React.FC = () => {
                                                   </svg>
                                              </div>
                                              <div className="ml-3">
-                                                  <p className="text-sm text-red-800">{displayError}</p>
+                                                  <p className="text-sm text-red-800 dark:text-red-300">{displayError}</p>
                                              </div>
                                         </div>
                                    </div>
@@ -122,7 +122,7 @@ const LoginPage: React.FC = () => {
 
                               {/* Email Field */}
                               <div>
-                                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Email
                                    </label>
                                    <input
@@ -133,7 +133,7 @@ const LoginPage: React.FC = () => {
                                         required
                                         value={credentials.email}
                                         onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-primary focus:border-primary"
                                         placeholder="Nhập email của bạn"
                                         disabled={isLoading}
                                    />
@@ -141,7 +141,7 @@ const LoginPage: React.FC = () => {
 
                               {/* Password Field */}
                               <div>
-                                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Mật khẩu
                                    </label>
                                    <div className="relative">
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
                                              required
                                              value={credentials.password}
                                              onChange={handleInputChange}
-                                             className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary"
+                                             className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-primary focus:border-primary"
                                              placeholder="Nhập mật khẩu"
                                              disabled={isLoading}
                                         />
@@ -164,9 +164,9 @@ const LoginPage: React.FC = () => {
                                              disabled={isLoading}
                                         >
                                              {showPassword ? (
-                                                  <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                                                  <EyeSlashIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                                              ) : (
-                                                  <EyeIcon className="h-5 w-5 text-gray-400" />
+                                                  <EyeIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                                              )}
                                         </button>
                                    </div>
@@ -213,7 +213,7 @@ const LoginPage: React.FC = () => {
                               <div className="text-center">
                                    <Link
                                         to="/forgot-password"
-                                        className="text-sm text-primary hover:text-blue-700"
+                                        className="text-sm text-primary hover:text-blue-700 dark:text-primary dark:hover:text-blue-400"
                                    >
                                         Quên mật khẩu?
                                    </Link>
@@ -225,19 +225,19 @@ const LoginPage: React.FC = () => {
                     <div className="text-center">
                          <Link
                               to="/"
-                              className="text-sm text-gray-600 hover:text-gray-900"
+                              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                          >
-                              ← Quay về trang chủ
+                              ← Quay về Website
                          </Link>
                     </div>
 
                     {/* Demo Credentials (for development) */}
                     {import.meta.env.DEV && (
-                         <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                              <h3 className="text-sm font-medium text-yellow-800 mb-2">
+                         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+                              <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-2">
                                    Demo Credentials (Development Only)
                               </h3>
-                              <div className="text-xs text-yellow-700 space-y-1">
+                              <div className="text-xs text-yellow-700 dark:text-yellow-400 space-y-1">
                                    <p><strong>Admin:</strong> admin@giasuhoangha.com / admin123</p>
                                    <p><strong>Staff:</strong> staff@giasuhoangha.com / staff123</p>
                               </div>
@@ -248,4 +248,4 @@ const LoginPage: React.FC = () => {
      );
 };
 
-export default LoginPage; 
+export default LoginPage;

@@ -6,6 +6,8 @@ const EMAILJS_TEMPLATE_ID_CONTACT =
   import.meta.env.VITE_EMAILJS_TEMPLATE_ID_CONTACT || 'template_contact';
 const EMAILJS_TEMPLATE_ID_REGISTRATION =
   import.meta.env.VITE_EMAILJS_TEMPLATE_ID_REGISTRATION || 'template_registration';
+const EMAILJS_TEMPLATE_ID_AUTO_REPLY =
+  import.meta.env.VITE_EMAILJS_TEMPLATE_ID_AUTO_REPLY || 'template_auto_reply';
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'your_public_key';
 
 // Initialize EmailJS
@@ -30,6 +32,7 @@ interface RegistrationEmailParams {
   student_phone: string;
   course_name: string;
   course_id: string;
+  course_schedule?: string;
   registration_date: string;
   to_name: string;
   reply_to: string;
@@ -83,7 +86,8 @@ export const sendRegistrationEmail = async (
   studentEmail: string,
   studentPhone: string,
   courseName: string,
-  courseId: string
+  courseId: string,
+  courseSchedule?: string
 ): Promise<{ success: boolean; message: string }> => {
   try {
     const templateParams: RegistrationEmailParams = {
@@ -92,6 +96,7 @@ export const sendRegistrationEmail = async (
       student_phone: studentPhone,
       course_name: courseName,
       course_id: courseId,
+      course_schedule: courseSchedule || 'Thời gian linh hoạt',
       registration_date: new Date().toLocaleDateString('vi-VN'),
       to_name: 'Trung tâm Gia Sư Hoàng Hà',
       reply_to: studentEmail,
@@ -139,7 +144,7 @@ export const sendAutoReplyEmail = async (
       reply_to: 'giasuhoangha.tpth@gmail.com',
     };
 
-    await emailjs.send(EMAILJS_SERVICE_ID, 'template_auto_reply', templateParams);
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_AUTO_REPLY, templateParams);
   } catch (error) {
     console.error('Error sending auto-reply email:', error);
     // Don't throw error for auto-reply failure

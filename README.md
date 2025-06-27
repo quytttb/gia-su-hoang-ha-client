@@ -152,21 +152,34 @@ npm run deploy:quick # Deploy nhanh
 ## 📁 **Cấu Trúc Dự Án**
 
 ```
-src/
-├── components/          # React components
-│   ├── layout/         # Layout components (Header, Footer)
-│   ├── shared/         # Shared components (WhatsAppButton, etc.)
-│   └── ui/             # UI components
-├── pages/              # Page components
-├── services/           # API services
-│   ├── emailService.ts # EmailJS integration
-│   ├── whatsappService.ts # WhatsApp integration
-│   └── dataService.ts  # Data management
-├── utils/              # Utility functions
-│   ├── seo.ts         # SEO utilities
-│   └── security.ts    # Security utilities
-├── types/              # TypeScript types
-└── styles/             # CSS styles
+├── docs/                   # Documentation and reports
+│   └── seo-reports/       # SEO test reports
+├── public/                 # Static assets
+│   └── images/            # Public images (logos, etc.)
+├── scripts/               # Build and deployment scripts
+├── src/                   # Source code
+│   ├── components/        # React components
+│   │   ├── auth/         # Authentication components
+│   │   ├── blog/         # Blog-related components
+│   │   ├── classes/      # Course/class components
+│   │   ├── contact/      # Contact form components
+│   │   ├── home/         # Homepage components
+│   │   ├── layout/       # Layout components (Header, Footer)
+│   │   ├── panel/        # Admin panel components
+│   │   ├── schedule/     # Schedule components
+│   │   ├── shared/       # Shared/common components
+│   │   └── ui/           # Reusable UI components
+│   ├── config/           # Configuration files
+│   ├── constants/        # Constants and static data
+│   ├── contexts/         # React contexts
+│   ├── hooks/            # Custom React hooks
+│   ├── lib/              # External libraries setup
+│   ├── pages/            # Page components
+│   ├── services/         # API services and external integrations
+│   ├── types/            # TypeScript type definitions
+│   └── utils/            # Utility functions
+└── tools/                # Development tools
+    └── cloudinary-scripts/ # Cloudinary setup scripts
 ```
 
 ## 🔧 **Công Nghệ Sử Dụng**

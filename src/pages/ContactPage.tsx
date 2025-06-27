@@ -6,6 +6,7 @@ import {
   initEmailJS,
   getEmailServiceStatus,
 } from '../services/emailService';
+import { saveContactMessage } from '../services/contactService';
 
 import {
   validateAndSanitizeEmail,
@@ -16,14 +17,19 @@ import {
   getClientIdentifier,
 } from '../utils/security';
 import { updateSEO, seoData } from '../utils/seo';
+import { useToastContext } from '../contexts/ToastContext';
 import SectionHeading from '../components/shared/SectionHeading';
+import EmailServiceStatus from '../components/shared/EmailServiceStatus';
 import Chatbot from '../components/shared/Chatbot';
 // Import Font Awesome components
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF } from '@fortawesome/free-brands-svg-icons';
+import SkeletonLoading from '../components/shared/SkeletonLoading';
 
 const ContactPage = () => {
+  const toast = useToastContext();
+
   // Contact form state
   const [formData, setFormData] = useState({
     name: '',
@@ -54,6 +60,39 @@ const ContactPage = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  // Dev helper functions for contact form
+  const handleDevFillContactForm = (data: any) => {
+    setFormData(data);
+    setErrors({}); // Clear any existing errors
+  };
+
+  const handleDevClearContactForm = () => {
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+      message: '',
+    });
+    setErrors({});
+  };
+
+  // Expose dev functions globally for DevAdminHelper
+  useEffect(() => {
+    // Only expose in development mode
+    if (process.env.NODE_ENV === 'development') {
+      (window as any).__devContactFormFill = handleDevFillContactForm;
+      (window as any).__devContactFormClear = handleDevClearContactForm;
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (process.env.NODE_ENV === 'development') {
+        delete (window as any).__devContactFormFill;
+        delete (window as any).__devContactFormClear;
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -93,11 +132,15 @@ const ContactPage = () => {
     const clientId = getClientIdentifier();
     if (!defaultRateLimiter.isAllowed(clientId)) {
       const remaining = defaultRateLimiter.getRemainingRequests(clientId);
-      alert(`Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau. Còn lại: ${remaining} yêu cầu.`);
+      toast.warning(
+        'Quá nhiều yêu cầu',
+        `Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau. Còn lại: ${remaining} yêu cầu.`
+      );
       return;
     }
 
     if (!validateForm()) {
+      toast.error('Lỗi validation', 'Vui lòng kiểm tra lại thông tin đã nhập');
       return;
     }
 
@@ -114,21 +157,35 @@ const ContactPage = () => {
       !emailValidation.isValid ||
       !messageValidation.isValid
     ) {
+      toast.error('Lỗi validation', 'Thông tin không hợp lệ');
       return;
     }
 
     try {
       setLoading(true);
 
-      // Send contact email
-      const result = await sendContactEmail(
+      // Save to Firestore first
+      const saveResult = await saveContactMessage(
         nameValidation.sanitized,
         emailValidation.sanitized,
         phoneValidation.sanitized,
         messageValidation.sanitized
       );
 
-      if (result.success) {
+      if (!saveResult.success) {
+        console.warn('Failed to save to Firestore:', saveResult.error);
+        // Continue with email sending even if Firestore fails
+      }
+
+      // Send contact email
+      const emailResult = await sendContactEmail(
+        nameValidation.sanitized,
+        emailValidation.sanitized,
+        phoneValidation.sanitized,
+        messageValidation.sanitized
+      );
+
+      if (emailResult.success) {
         // Send auto-reply to customer
         await sendAutoReplyEmail(nameValidation.sanitized, emailValidation.sanitized, false);
 
@@ -140,15 +197,21 @@ const ContactPage = () => {
           message: '',
         });
 
-        // Show success message
-        alert(result.message);
+        // Show success toast
+        toast.success(
+          'Gửi tin nhắn thành công!',
+          'Chúng tôi đã nhận được tin nhắn và sẽ phản hồi trong thời gian sớm nhất.'
+        );
       } else {
-        // Show error message
-        alert(result.message);
+        // Show error toast
+        toast.error('Gửi tin nhắn thất bại', emailResult.message);
       }
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      alert('Đã có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ trực tiếp qua số điện thoại.');
+      toast.error(
+        'Có lỗi xảy ra',
+        'Vui lòng thử lại sau hoặc liên hệ trực tiếp qua số điện thoại.'
+      );
     } finally {
       setLoading(false);
     }
@@ -157,21 +220,14 @@ const ContactPage = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gray-100 dark:bg-gray-900 py-16">
-        <div className="container-custom text-center">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">Liên Hệ</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Hãy liên hệ với chúng tôi nếu bạn có bất kỳ câu hỏi nào về các lớp học
-          </p>
-        </div>
-      </section>
+      {/* Xóa hero section tiêu đề ở đây */}
 
-      <section className="section-padding">
+      <section className="section-padding" aria-labelledby="contact-info-heading">
         <div className="container-custom">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div>
-              <SectionHeading title="Thông Tin Liên Hệ" centered={false} />
+              <SectionHeading title="Thông Tin Liên Hệ" centered={false} id="contact-info-heading" />
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
@@ -239,6 +295,9 @@ const ContactPage = () => {
             <div>
               <SectionHeading title="Gửi Tin Nhắn" centered={false} />
 
+              {/* Email Service Status Warning */}
+              <EmailServiceStatus />
+
               {success ? (
                 <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-lg">
                   <div className="flex items-center">
@@ -279,10 +338,10 @@ const ContactPage = () => {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  <div className="mb-4">
-                    <label htmlFor="name" className="block text-gray-800 dark:text-gray-200 font-medium mb-1">
-                      Họ và tên <span className="text-red-500">*</span>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-gray-700 dark:text-gray-300 mb-2">
+                      Họ tên *
                     </label>
                     <input
                       type="text"
@@ -290,15 +349,19 @@ const ContactPage = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
-                      placeholder="Nhập họ và tên"
+                      className={`w-full px-4 py-3 rounded-lg border ${errors.name
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-blue-500'
+                        } focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+                      placeholder="Nhập họ tên của bạn"
+                      disabled={loading}
                     />
                     {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                   </div>
 
-                  <div className="mb-4">
-                    <label htmlFor="phone" className="block text-gray-800 dark:text-gray-200 font-medium mb-1">
-                      Số điện thoại <span className="text-red-500">*</span>
+                  <div>
+                    <label htmlFor="phone" className="block text-gray-700 dark:text-gray-300 mb-2">
+                      Số điện thoại *
                     </label>
                     <input
                       type="tel"
@@ -306,15 +369,19 @@ const ContactPage = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
-                      placeholder="Nhập số điện thoại"
+                      className={`w-full px-4 py-3 rounded-lg border ${errors.phone
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-blue-500'
+                        } focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+                      placeholder="Nhập số điện thoại của bạn"
+                      disabled={loading}
                     />
                     {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                   </div>
 
-                  <div className="mb-4">
-                    <label htmlFor="email" className="block text-gray-800 dark:text-gray-200 font-medium mb-1">
-                      Email <span className="text-red-500">*</span>
+                  <div>
+                    <label htmlFor="email" className="block text-gray-700 dark:text-gray-300 mb-2">
+                      Email *
                     </label>
                     <input
                       type="email"
@@ -322,15 +389,19 @@ const ContactPage = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
-                      placeholder="Nhập địa chỉ email"
+                      className={`w-full px-4 py-3 rounded-lg border ${errors.email
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-blue-500'
+                        } focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+                      placeholder="Nhập địa chỉ email của bạn"
+                      disabled={loading}
                     />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                   </div>
 
-                  <div className="mb-4">
-                    <label htmlFor="message" className="block text-gray-800 dark:text-gray-200 font-medium mb-1">
-                      Tin nhắn <span className="text-red-500">*</span>
+                  <div>
+                    <label htmlFor="message" className="block text-gray-700 dark:text-gray-300 mb-2">
+                      Tin nhắn *
                     </label>
                     <textarea
                       id="message"
@@ -338,62 +409,37 @@ const ContactPage = () => {
                       value={formData.message}
                       onChange={handleChange}
                       rows={5}
-                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.message ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400`}
-                      placeholder="Nhập tin nhắn"
+                      className={`w-full px-4 py-3 rounded-lg border ${errors.message
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-blue-500'
+                        } focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+                      placeholder="Nhập tin nhắn của bạn"
+                      disabled={loading}
                     ></textarea>
-                    {errors.message && (
-                      <p className="text-red-500 text-sm mt-1">{errors.message}</p>
-                    )}
+                    {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
                   </div>
 
-                  <div className="mt-6">
+                  <div className="flex items-center justify-between">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="btn-primary w-full flex items-center justify-center mb-4"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50"
                     >
                       {loading ? (
-                        <>
-                          <svg
-                            className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Đang gửi...
-                        </>
+                        <div className="flex items-center">
+                          <div className="mr-2">Đang gửi</div>
+                          <SkeletonLoading type="avatar" width="20px" height="20px" className="bg-blue-400" />
+                        </div>
                       ) : (
                         'Gửi tin nhắn'
                       )}
                     </button>
 
-                    {/* Facebook Alternative */}
-                    <div className="text-center">
-                      <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">Hoặc liên hệ trực tiếp qua:</p>
-                      <a
-                        href="https://www.facebook.com/profile.php?id=61575087818708"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                      >
-                        <FontAwesomeIcon icon={faFacebookF} className="w-5 h-5" />
-                        <span>Trang Facebook chính thức</span>
-                      </a>
-                    </div>
+                    {success && (
+                      <span className="text-green-600 dark:text-green-400">
+                        Tin nhắn đã được gửi thành công!
+                      </span>
+                    )}
                   </div>
                 </form>
               )}

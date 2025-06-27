@@ -12,7 +12,7 @@ interface ErrorDisplayProps {
 
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
      message = 'Đã có lỗi xảy ra',
-     details = 'Xin lỗi, đã có lỗi không mong muốn xảy ra. Vui lòng thử lại sau.',
+     details = 'Xin lỗi, đã có lỗi không mong muốn xảy ra. Vui lòng thử lại sau. Nếu vấn đề vẫn tiếp diễn, hãy kiểm tra kết nối mạng hoặc liên hệ hỗ trợ.',
      fullPage = false,
      onRetry = () => window.location.reload(),
      retryLabel = 'Thử lại',

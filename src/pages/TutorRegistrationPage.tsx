@@ -8,7 +8,7 @@ import {
      defaultRateLimiter,
      getClientIdentifier,
 } from '../utils/security';
-import { sendRegistrationEmail, sendAutoReplyEmail, initEmailJS } from '../services/emailService';
+import registrationsService from '../services/firestore/registrationsService';
 import confetti from 'canvas-confetti';
 import {
      Dialog,
@@ -41,7 +41,7 @@ const TutorRegistrationPage = () => {
 
      useEffect(() => {
           // Initialize EmailJS
-          initEmailJS();
+          // initEmailJS();
      }, []);
 
      // Thông tin Gia sư
@@ -116,7 +116,7 @@ const TutorRegistrationPage = () => {
      };
 
      const handleConfirmSubmit = async () => {
-          if (!currentTutorInfo) {
+          if (!currentTutorInfo || !tutorType) {
                return;
           }
 
@@ -141,31 +141,38 @@ const TutorRegistrationPage = () => {
                setSubmitting(true);
                setShowConfirmDialog(false);
 
-               // Send registration email for tutor search
-               const result = await sendRegistrationEmail(
-                    nameValidation.sanitized,
-                    '',
-                    parentPhoneValidation.sanitized,
-                    `Tìm ${currentTutorInfo.name}`,
-                    'tutor-search'
-               );
-
-               if (result.success) {
-                    // Send auto-reply to student
-                    await sendAutoReplyEmail(nameValidation.sanitized, '', true);
-
-                    // Hiệu ứng pháo hoa
-                    confetti({
-                         particleCount: 100,
-                         spread: 70,
-                         origin: { y: 0.6 }
-                    });
-
-                    // Hiện dialog thành công
-                    setShowSuccessDialog(true);
-               } else {
-                    alert(result.message);
+               // Lưu vào Firestore qua registrationsService
+               const registrationData = {
+                    type: tutorType === 'teacher' ? 'tutor_teacher' as const : 'tutor_student' as const,
+                    tutorType: tutorType,
+                    tutorCriteria: formData.tutorCriteria,
+                    studentName: nameValidation.sanitized,
+                    studentPhone: parentPhoneValidation.sanitized,
+                    studentSchool: formData.school,
+                    parentName: formData.parentName,
+                    parentPhone: parentPhoneValidation.sanitized,
+                    parentAddress: formData.parentAddress,
+                    preferredSchedule: '', // Có thể bổ sung nếu form có
+                    notes: formData.academicDescription,
+                    registrationDate: new Date().toISOString(),
+                    status: 'pending' as const,
+               };
+               const createResult = await registrationsService.createRegistration(registrationData);
+               if (createResult.error) {
+                    console.error('Error creating tutor registration:', createResult.error);
+                    alert(`Có lỗi xảy ra khi đăng ký: ${createResult.error}`);
+                    setSubmitting(false);
+                    return;
                }
+
+               // Skip email processing for now
+               // Show confetti and success dialog
+               confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+               });
+               setShowSuccessDialog(true);
           } catch (error) {
                console.error('Error submitting tutor search request:', error);
                alert('Đã có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ trực tiếp qua Zalo.');
@@ -359,7 +366,7 @@ const TutorRegistrationPage = () => {
                                                             onClick={() => window.open('https://zalo.me/0385510892', '_blank')}
                                                             className="w-full inline-flex items-center justify-center space-x-2 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm"
                                                        >
-                                                            <img src="/assets/zalo-logo.svg" alt="Zalo" className="w-5 h-5" />
+                                                            <img src="/images/zalo-logo.svg" alt="Zalo" className="w-5 h-5" />
                                                             <span>Tư vấn qua Zalo</span>
                                                        </button>
                                                   </div>
@@ -469,4 +476,4 @@ const TutorRegistrationPage = () => {
      );
 };
 
-export default TutorRegistrationPage; 
+export default TutorRegistrationPage;

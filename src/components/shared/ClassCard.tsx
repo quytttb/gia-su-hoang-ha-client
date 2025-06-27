@@ -16,7 +16,6 @@ const ClassCard = ({ class: classData }: ClassCardProps) => {
     name,
     description,
     targetAudience,
-    schedule,
     price,
     discount,
     discountEndDate,
@@ -44,9 +43,15 @@ const ClassCard = ({ class: classData }: ClassCardProps) => {
           {parseMarkdown(description)}
         </div>
 
-        <div className="mb-3">
+        <div className="mb-3 space-y-1">
           <span className="text-gray-700 dark:text-gray-300 text-sm block">
-            <strong>Lịch học:</strong> {schedule}
+            <strong>Lịch học:</strong> thứ 2 đến 4
+          </span>
+          <span className="text-gray-700 dark:text-gray-300 text-sm block">
+            <strong>Giờ học:</strong> 19:30 đến 21:30
+          </span>
+          <span className="text-gray-700 dark:text-gray-300 text-sm block">
+            <strong>Số lượng:</strong> 12
           </span>
         </div>
 

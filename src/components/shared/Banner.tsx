@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Banner as BannerType } from '../../types';
 
 interface BannerProps {
@@ -7,30 +7,102 @@ interface BannerProps {
   interval?: number;
 }
 
-const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
+const Banner = ({ banners, autoplay = true, interval = 8000 }: BannerProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Filter only active banners and sort by order
   const activeBanners = banners
     .filter(banner => banner.isActive)
     .sort((a, b) => a.order - b.order);
 
-  useEffect(() => {
-    if (!autoplay || activeBanners.length <= 1) return;
+  // Function to reset and start timer
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
 
-    const timer = setInterval(() => {
-      setCurrentIndex(prevIndex => (prevIndex + 1) % activeBanners.length);
-    }, interval);
-
-    return () => clearInterval(timer);
+    if (autoplay && activeBanners.length > 1) {
+      timerRef.current = setInterval(() => {
+        setCurrentIndex(prevIndex => (prevIndex + 1) % activeBanners.length);
+      }, interval);
+    }
   }, [autoplay, activeBanners.length, interval]);
+
+  useEffect(() => {
+    resetTimer();
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [resetTimer]);
 
   const handlePrev = () => {
     setCurrentIndex(prevIndex => (prevIndex - 1 + activeBanners.length) % activeBanners.length);
+    resetTimer(); // Reset timer when user manually navigates
   };
 
   const handleNext = () => {
     setCurrentIndex(prevIndex => (prevIndex + 1) % activeBanners.length);
+    resetTimer(); // Reset timer when user manually navigates
+  };
+
+  const handleIndicatorClick = (index: number) => {
+    setCurrentIndex(index);
+    resetTimer(); // Reset timer when user clicks indicator
+  };
+
+  // Swipe/drag logic
+  let startX = 0;
+  let isDragging = false;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const diff = e.touches[0].clientX - startX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        handlePrev();
+      } else {
+        handleNext();
+      }
+      isDragging = false;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    isDragging = false;
+  };
+
+  // Mouse drag for desktop
+  let mouseDown = false;
+  let mouseStartX = 0;
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseDown = true;
+    mouseStartX = e.clientX;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!mouseDown) return;
+    const diff = e.clientX - mouseStartX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        handlePrev();
+      } else {
+        handleNext();
+      }
+      mouseDown = false;
+    }
+  };
+
+  const handleMouseUp = () => {
+    mouseDown = false;
   };
 
   if (activeBanners.length === 0) {
@@ -38,7 +110,16 @@ const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
   }
 
   return (
-    <div className="relative overflow-hidden h-[400px]">
+    <div
+      className="relative overflow-hidden h-[400px]"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
       {/* Banner Images */}
       <div
         className="flex transition-transform duration-500"
@@ -48,19 +129,37 @@ const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
           <div key={banner.id} className="w-full flex-shrink-0">
             <div
               className="h-[400px] bg-cover bg-center relative"
-              style={{ backgroundImage: `url(${banner.imageUrl})` }}
+              style={{
+                backgroundImage: `url(${banner.imageUrl})`
+              }}
             >
-              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                <div className="text-center text-white p-4 max-w-3xl">
-                  <h2 className="text-4xl font-bold mb-2">{banner.title}</h2>
-                  <p className="text-xl mb-6">{banner.subtitle}</p>
-                  {banner.link && (
-                    <a href={banner.link} className="btn-primary inline-block">
-                      Xem thêm
-                    </a>
-                  )}
+              {/* Chỉ hiển thị overlay khi có tiêu đề, phụ đề hoặc link */}
+              {(banner.title || banner.subtitle || banner.link) && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center p-4 max-w-3xl">
+                    <div className="inline-block bg-black/40 backdrop-blur-sm rounded-xl px-6 py-4">
+                      {banner.title && (
+                        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-white drop-shadow-2xl" style={{ textShadow: '0 2px 16px #000, 0 1px 0 #222' }}>
+                          {banner.title}
+                        </h2>
+                      )}
+                      {banner.subtitle && (
+                        <p className="text-xl md:text-2xl mb-6 text-white/95 drop-shadow-xl font-semibold" style={{ textShadow: '0 2px 12px #000, 0 1px 0 #222' }}>
+                          {banner.subtitle}
+                        </p>
+                      )}
+                      {banner.link && (
+                        <a
+                          href={banner.link}
+                          className="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 inline-block"
+                        >
+                          Xem thêm
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         ))}
@@ -113,7 +212,7 @@ const Banner = ({ banners, autoplay = true, interval = 5000 }: BannerProps) => {
               key={index}
               className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-primary' : 'bg-white'
                 }`}
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => handleIndicatorClick(index)}
             />
           ))}
         </div>

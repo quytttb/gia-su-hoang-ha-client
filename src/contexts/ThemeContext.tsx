@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -34,7 +34,7 @@ export const ThemeProvider = ({
      };
 
      // Update resolved theme based on current theme setting
-     const updateResolvedTheme = (currentTheme: Theme) => {
+     const updateResolvedTheme = useCallback((currentTheme: Theme) => {
           const newResolvedTheme = currentTheme === 'system' ? getSystemTheme() : currentTheme;
           setResolvedTheme(newResolvedTheme);
 
@@ -51,7 +51,7 @@ export const ThemeProvider = ({
                     newResolvedTheme === 'dark' ? '#1f2937' : '#ffffff'
                );
           }
-     };
+     }, []);
 
      // Set theme with localStorage persistence
      const setTheme = (newTheme: Theme) => {
@@ -72,7 +72,7 @@ export const ThemeProvider = ({
           const initialTheme = stored || defaultTheme;
           setThemeState(initialTheme);
           updateResolvedTheme(initialTheme);
-     }, [defaultTheme, storageKey]);
+     }, [defaultTheme, storageKey, updateResolvedTheme]);
 
      // Listen for system theme changes
      useEffect(() => {
@@ -86,12 +86,12 @@ export const ThemeProvider = ({
 
           mediaQuery.addEventListener('change', handleChange);
           return () => mediaQuery.removeEventListener('change', handleChange);
-     }, [theme]);
+     }, [theme, updateResolvedTheme]);
 
      // Update resolved theme when theme changes
      useEffect(() => {
           updateResolvedTheme(theme);
-     }, [theme]);
+     }, [theme, updateResolvedTheme]);
 
      const value: ThemeContextType = {
           theme,

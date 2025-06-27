@@ -220,7 +220,7 @@ export const generateClassStructuredData = (classData: any) => {
           addressCountry: 'VN',
         },
       },
-      schedule: classData.schedule,
+      schedule: 'Thứ 2 đến 4, 19:30 - 21:30',
     },
   };
 };

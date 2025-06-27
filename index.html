@@ -8,8 +8,8 @@
   <link rel="shortcut icon" href="/images/logo.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1E40AF" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#1E293B" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
 
   <!-- Security Headers -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -102,7 +102,7 @@
   </script>
 </head>
 
-<body>
+<body style="background-color: #ffffff; margin: 0;">
   <!-- Prevent flash of unstyled content -->
   <script>
     (function () {
@@ -110,6 +110,9 @@
       const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
       if (isDark) {
         document.documentElement.classList.add('dark');
+        document.body.style.backgroundColor = '#0f172a';
+      } else {
+        document.body.style.backgroundColor = '#ffffff';
       }
     })();
   </script>
