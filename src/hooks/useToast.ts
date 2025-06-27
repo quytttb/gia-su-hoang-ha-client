@@ -13,10 +13,6 @@ export interface Toast {
 export const useToast = () => {
      const [toasts, setToasts] = useState<Toast[]>([]);
 
-     const removeToast = useCallback((id: string) => {
-          setToasts(prev => prev.filter(toast => toast.id !== id));
-     }, []);
-
      const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
           const id = Math.random().toString(36).substr(2, 9);
           const newToast: Toast = {
@@ -33,7 +29,11 @@ export const useToast = () => {
           }, newToast.duration);
 
           return id;
-     }, [removeToast]);
+     }, []);
+
+     const removeToast = useCallback((id: string) => {
+          setToasts(prev => prev.filter(toast => toast.id !== id));
+     }, []);
 
      const success = useCallback((title: string, message?: string, duration?: number) => {
           return addToast({ type: 'success', title, message, duration });

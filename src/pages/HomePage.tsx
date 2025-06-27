@@ -152,6 +152,18 @@ const HomePage = () => {
       <div id="contact">
         <ContactCTASection />
       </div>
+      {/* Đối tác của chúng tôi */}
+      <section className="section-padding bg-white dark:bg-gray-900" id="partners">
+        <div className="container-custom">
+          <h2 className="text-2xl font-bold text-center mb-6 text-primary-700 dark:text-primary-400 uppercase">Đối tác của chúng tôi</h2>
+          <div className="flex flex-wrap justify-center items-center gap-8 mt-8">
+            <img src="/images/partners/lam_son.png" alt="THPT Chuyên Lam Sơn" className="h-20 md:h-28 object-contain max-w-[180px]" />
+            <img src="/images/partners/dao_duy_tu.png" alt="THPT Đào Duy Từ" className="h-20 md:h-28 object-contain max-w-[180px]" />
+            <img src="/images/partners/ham_rong.png" alt="THPT Hàm Rồng" className="h-20 md:h-28 object-contain max-w-[180px]" />
+            <img src="/images/partners/tran_mai_ninh.png" alt="THCS Trần Mai Ninh" className="h-20 md:h-28 object-contain max-w-[180px]" />
+          </div>
+        </div>
+      </section>
       <Suspense fallback={null}>
         <Chatbot />
       </Suspense>
