@@ -195,10 +195,11 @@ const AboutPage = () => {
               <p className="text-gray-700 text-lg leading-relaxed dark:text-gray-200 mb-6">{centerInfo.history}</p>
             </div>
             <div className="flex flex-col items-center md:col-span-1">
-              <img src="/assets/images/founder-placeholder.jpg" alt="Nhà sáng lập" className="w-48 h-48 object-cover rounded-full shadow mb-4" />
+              <img src="/images/real-photos/fbf5ce260afebda0e4ef.jpg" alt="Nhà sáng lập" className="w-64 h-64 object-cover rounded-full shadow-lg mb-6" />
               <div className="text-center">
-                <div className="font-bold text-lg text-primary-700 dark:text-primary-400">Nhà sáng lập</div>
-                <div className="text-gray-700 dark:text-gray-200">(Đang cập nhật)</div>
+                <div className="font-bold text-2xl text-accent mb-2">NGUYỄN NGUYÊN HOÀNG</div>
+                <div className="font-semibold text-lg text-primary mb-1">Nhà Sáng lập</div>
+                <div className="text-gray-700 dark:text-gray-300">Trung tâm Gia sư Hoàng Hà</div>
               </div>
             </div>
           </div>
@@ -316,20 +317,20 @@ const AboutPage = () => {
                 </div>
               ))
               : [
-                'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b',
-                'https://images.unsplash.com/photo-1606326608802-164e734c2fd9',
-                'https://images.unsplash.com/photo-1606326608670-21cb955e5741',
-                'https://images.unsplash.com/photo-1645290851823-205dc9d23ea0',
-                'https://images.unsplash.com/photo-1434030216411-0b793f4b4173',
-                'https://images.unsplash.com/photo-1509062522246-3755977927d7',
-                'https://images.unsplash.com/photo-1510531704581-5b2870972060',
-                'https://images.unsplash.com/photo-1524178232363-1fb2b075b655',
-                'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4',
-                'https://images.unsplash.com/photo-1568333261345-0918efdce2d9',
+                '/images/real-photos/3d771690d24865163c59.jpg',
+                '/images/real-photos/786448b78c6f3b31627e.jpg',
+                '/images/real-photos/bf72059fc14776192f56.jpg',
+                '/images/real-photos/37a0735db78500db5994.jpg',
+                '/images/real-photos/e6bc4d52898a3ed4679b.jpg',
+                '/images/real-photos/cf33f8c83c108b4ed201.jpg',
+                '/images/real-photos/d7391421d0f967a73ee8.jpg',
+                '/images/real-photos/0021e9c32d1b9a45c30a.jpg',
+                '/images/real-photos/024a47b98361343f6d70.jpg',
+                '/images/real-photos/fbf5ce260afebda0e4ef.jpg',
               ].map((url, idx) => (
                 <div key={url} className="overflow-hidden rounded-lg shadow-md group relative cursor-pointer" onClick={() => setPreviewImg(url)}>
                   <img
-                    src={url + '?w=400&h=300&fit=crop'}
+                    src={url}
                     alt={`Hình thực tế ${idx + 1}`}
                     className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
@@ -342,7 +343,7 @@ const AboutPage = () => {
             <DialogContent className="max-w-3xl flex flex-col items-center">
               {previewImg ? (
                 <img
-                  src={previewImg + '?w=900&fit=crop'}
+                  src={previewImg}
                   alt="Preview"
                   className="w-full max-h-[80vh] object-contain rounded-lg"
                   loading="lazy"
