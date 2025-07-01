@@ -25,16 +25,6 @@ const Header = () => {
     {
       name: 'Trang chủ',
       href: '/',
-      hasDropdown: true,
-      dropdown: [
-        { name: 'Banner chính', href: '/#banner' },
-        { name: 'Giới thiệu', href: '/#introduction' },
-        { name: 'Lớp học nổi bật', href: '/#featured-classes' },
-        { name: 'Tin tức & Blog', href: '/#blog' },
-        { name: 'Chia sẻ của phụ huynh', href: '/#feedback' },
-        { name: 'Liên hệ', href: '/#contact' },
-        { name: 'Đối tác', href: '/#partners' },
-      ]
     },
     {
       name: 'Về chúng tôi',
@@ -46,9 +36,9 @@ const Header = () => {
         { name: 'Tầm nhìn', href: '/about#vision' },
         { name: 'Sứ mệnh', href: '/about#mission' },
         { name: 'Dịch vụ cung cấp', href: '/about#services' },
-        { name: 'Thư ngỏ', href: '/about#letter' },
-        { name: 'Hình ảnh thực tế', href: '/about#gallery' },
         { name: 'Đội ngũ giáo viên', href: '/about#team' },
+        { name: 'Hình ảnh thực tế', href: '/about#gallery' },
+        { name: 'Thư ngỏ', href: '/about#letter' },
       ]
     },
     { name: 'Lớp học', href: '/classes' },

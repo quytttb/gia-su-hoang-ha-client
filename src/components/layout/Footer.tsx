@@ -9,7 +9,7 @@ const Footer = ({ isContactPage = false }: FooterProps) => {
   return (
     <footer className="bg-slate-100 dark:bg-gray-900 text-gray-800 dark:text-white py-10 border-t border-gray-200 dark:border-gray-700">
       <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-[400px_320px_1fr] gap-8">
           <div>
             <Logo variant="text" size="lg" linkTo="/" className="mb-4" />
             <p className="text-gray-600 dark:text-gray-300 mb-2">Trung tâm gia sư uy tín tại Thanh Hóa</p>
@@ -59,42 +59,23 @@ const Footer = ({ isContactPage = false }: FooterProps) => {
 
           <div>
             <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Liên hệ</h4>
-            <address className="not-italic text-gray-600 dark:text-gray-300">
+            <address className="not-italic text-gray-600 dark:text-gray-300 mb-4">
               <p className="mb-2">
                 265 - ĐƯỜNG 06 - MẶT BẰNG 08, PHƯỜNG NAM NGẠN, THÀNH PHỐ THANH HOÁ, TỈNH THANH HOÁ
               </p>
               <p className="mb-2">Điện thoại: 0385.510.892 - 0962.390.161</p>
               <p className="mb-2">Email: giasuhoangha.tpth@gmail.com</p>
-              <p className="mb-2">
-                Facebook: <a
-                  href="https://www.facebook.com/profile.php?id=61575087818708"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  Gia Sư Hoàng Hà - TP Thanh Hoá
-                </a>
-              </p>
             </address>
-          </div>
-
-          <div>
-            <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Giờ làm việc</h4>
-            <ul className="text-gray-600 dark:text-gray-300">
-              <li className="mb-2">Thứ 2 - Thứ 6: 7:30 - 20:00</li>
-              <li className="mb-2">Thứ 7 - Chủ nhật: 8:00 - 17:00</li>
-            </ul>
             {!isContactPage && (
               <div className="mt-4 rounded overflow-hidden shadow">
                 <iframe
                   title="Facebook Page - Gia Sư Hoàng Hà"
-                  src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D61575087818708&tabs=timeline&width=340&height=150&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+                  src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D61575087818708&tabs=timeline&width=430&height=380&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
                   width="100%"
-                  height="150"
-                  style={{ border: 0 }}
-                  scrolling="no"
-                  frameBorder="0"
+                  height="380"
+                  style={{ border: 0, minHeight: 150 }}
                   allowFullScreen
+                  loading="lazy"
                   allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                 ></iframe>
               </div>

@@ -332,21 +332,49 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Thư ngỏ từ trung tâm */}
-      <section className="section-padding bg-gray-50 dark:bg-gray-900" id="letter">
-        <div className="container-custom flex flex-col md:flex-row items-center gap-8">
-          <img src="https://images.unsplash.com/photo-1473186505569-9c61870c11f9?auto=format&fit=crop&w=800&q=80" alt="Thư ngỏ" className="min-w-[270px] max-w-[320px] w-full h-60 object-cover rounded-lg shadow mb-4 md:mb-0" />
-          <div>
-            <h2 className="text-2xl font-bold mb-2 text-primary-700 dark:text-primary-400">Thư ngỏ từ Trung tâm</h2>
-            <p className="text-gray-700 dark:text-gray-200 text-lg mb-2">Kính gửi quý phụ huynh và học sinh,</p>
-            <p className="text-gray-700 dark:text-gray-200 text-base mb-2">Trung tâm Gia Sư Hoàng Hà xin gửi lời cảm ơn chân thành đến quý phụ huynh và học sinh đã tin tưởng, đồng hành cùng chúng tôi trong suốt thời gian qua. Chúng tôi cam kết không ngừng nâng cao chất lượng giảng dạy, lấy sự tiến bộ của học sinh làm mục tiêu hàng đầu. Rất mong tiếp tục nhận được sự ủng hộ và hợp tác của quý vị!</p>
-            <div className="mt-4 text-gray-600 dark:text-gray-300">Trân trọng,<br />Ban Giám Đốc Trung tâm Gia Sư Hoàng Hà</div>
+      {/* Team Section */}
+      {tutors.length > 0 ? (
+        <section id="team" className="section-padding bg-gray-50 dark:bg-gray-900" aria-labelledby="team-heading">
+          <div className="container-custom">
+            <SectionHeading
+              title="Đội ngũ giáo viên"
+              id="team-heading"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {tutors.map(tutor => (
+                <div
+                  key={tutor.id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <div className="h-64 overflow-hidden">
+                    <LazyImage src={tutor.imageUrl} alt={tutor.name} className="w-full h-full" />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-1">{tutor.name}</h3>
+                    <p className="text-primary font-medium mb-3 dark:text-gray-200">{tutor.specialty}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">{tutor.bio}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        <section id="team" className="section-padding bg-gray-50 dark:bg-gray-900" aria-labelledby="team-heading">
+          <div className="container-custom">
+            <SectionHeading
+              title="Đội ngũ giáo viên"
+              id="team-heading"
+            />
+            <div className="text-center py-10">
+              <p className="text-gray-500 text-lg">Thông tin giáo viên sẽ được cập nhật sớm.</p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Gallery Section */}
-      <section className="section-padding bg-white dark:bg-gray-900" aria-labelledby="gallery-heading">
+      <section className="section-padding bg-white dark:bg-gray-900" aria-labelledby="gallery-heading" id="gallery">
         <div className="container-custom">
           <SectionHeading
             title="Hình ảnh thực tế"
@@ -402,46 +430,19 @@ const AboutPage = () => {
       </section>
       {/* End Gallery Section */}
 
-      {/* Team Section */}
-      {tutors.length > 0 ? (
-        <section id="team" className="section-padding bg-gray-50 dark:bg-gray-900" aria-labelledby="team-heading">
-          <div className="container-custom">
-            <SectionHeading
-              title="Đội ngũ giáo viên"
-              id="team-heading"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {tutors.map(tutor => (
-                <div
-                  key={tutor.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800 dark:border-gray-700"
-                >
-                  <div className="h-64 overflow-hidden">
-                    <LazyImage src={tutor.imageUrl} alt={tutor.name} className="w-full h-full" />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-1">{tutor.name}</h3>
-                    <p className="text-primary font-medium mb-3 dark:text-gray-200">{tutor.specialty}</p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{tutor.bio}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Thư ngỏ từ trung tâm */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-900" id="letter">
+        <div className="container-custom flex flex-col md:flex-row items-center gap-8">
+          <img src="https://images.unsplash.com/photo-1473186505569-9c61870c11f9?auto=format&fit=crop&w=800&q=80" alt="Thư ngỏ" className="min-w-[270px] max-w-[320px] w-full h-60 object-cover rounded-lg shadow mb-4 md:mb-0" />
+          <div>
+            <h2 className="text-2xl font-bold mb-2 text-primary-700 dark:text-primary-400">Thư ngỏ từ Trung tâm</h2>
+            <p className="text-gray-700 dark:text-gray-200 text-lg mb-2">Kính gửi quý phụ huynh và học sinh,</p>
+            <p className="text-gray-700 dark:text-gray-200 text-base mb-2">Trung tâm Gia Sư Hoàng Hà xin gửi lời cảm ơn chân thành đến quý phụ huynh và học sinh đã tin tưởng, đồng hành cùng chúng tôi trong suốt thời gian qua. Chúng tôi cam kết không ngừng nâng cao chất lượng giảng dạy, lấy sự tiến bộ của học sinh làm mục tiêu hàng đầu. Rất mong tiếp tục nhận được sự ủng hộ và hợp tác của quý vị!</p>
+            <div className="mt-4 text-gray-600 dark:text-gray-300">Trân trọng,<br />Ban Giám Đốc Trung tâm Gia Sư Hoàng Hà</div>
           </div>
-        </section>
-      ) : (
-        <section id="team" className="section-padding bg-gray-50 dark:bg-gray-900" aria-labelledby="team-heading">
-          <div className="container-custom">
-            <SectionHeading
-              title="Đội ngũ giáo viên"
-              id="team-heading"
-            />
-            <div className="text-center py-10">
-              <p className="text-gray-500 text-lg">Thông tin giáo viên sẽ được cập nhật sớm.</p>
-            </div>
-          </div>
-        </section>
-      )}
+        </div>
+      </section>
+
       <Chatbot />
     </Layout>
   );
