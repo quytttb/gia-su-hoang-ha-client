@@ -108,5 +108,15 @@ service cloud.firestore {
       allow read: if true; // Public read for tutor display
       allow create, update, delete: if isStaff();
     }
+
+    // Blog posts collection
+    match /blogPosts/{postId} {
+      // Public can read only published posts; staff/admin can read all
+      allow read: if resource.data.status == 'published' || isStaff();
+      // Only staff (admin or staff role) may create or update posts
+      allow create, update: if isStaff();
+      // Only admin can delete (potential hard delete); otherwise prefer status toggle via update
+      allow delete: if isAdmin();
+    }
   }
 } 

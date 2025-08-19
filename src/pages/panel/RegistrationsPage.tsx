@@ -9,262 +9,282 @@ import classesService from '../../services/firestore/classesService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../hooks/useToast';
 import { Button } from '../../components/ui/button';
-import { RefreshCw, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { convertFirestoreClass } from '../../utils/classHelpers';
 
 interface PageRegistrationStats {
-     totalRegistrations: number;
-     pendingRegistrations: number;
-     approvedRegistrations: number;
-     rejectedRegistrations: number;
-     recentRegistrations: number;
+  totalRegistrations: number;
+  pendingRegistrations: number;
+  approvedRegistrations: number;
+  rejectedRegistrations: number;
+  recentRegistrations: number;
 }
 
 const RegistrationsPage: React.FC = () => {
-     const [searchParams] = useSearchParams();
-     const [registrations, setRegistrations] = useState<Registration[]>([]);
-     const [filteredClassName, setFilteredClassName] = useState<string>('');
-     const [stats, setStats] = useState<PageRegistrationStats>({
-          totalRegistrations: 0,
-          pendingRegistrations: 0,
-          approvedRegistrations: 0,
-          rejectedRegistrations: 0,
-          recentRegistrations: 0,
-     });
-     const [loading, setLoading] = useState(true);
-     const [statsLoading, setStatsLoading] = useState(true);
-     const { user } = useAuth();
-     const { error } = useToast();
-     const [activeTab, setActiveTab] = useState<'class' | 'tutor'>('class');
+  const [searchParams] = useSearchParams();
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [filteredClassName, setFilteredClassName] = useState<string>('');
+  const [stats, setStats] = useState<PageRegistrationStats>({
+    totalRegistrations: 0,
+    pendingRegistrations: 0,
+    approvedRegistrations: 0,
+    rejectedRegistrations: 0,
+    recentRegistrations: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const { user } = useAuth();
+  const { error } = useToast();
+  const [activeTab, setActiveTab] = useState<'class' | 'tutor'>('class');
 
-     const classId = searchParams.get('classId');
+  const classId = searchParams.get('classId');
 
-     const fetchRegistrations = async () => {
-          try {
-               setLoading(true);
+  const fetchRegistrations = async () => {
+    try {
+      setLoading(true);
 
-               let result;
-               if (activeTab === 'class' && classId) {
-                    // Filter by specific class
-                    result = await registrationsService.getRegistrations({ classId });
+      let result;
+      if (activeTab === 'class' && classId) {
+        // Filter by specific class
+        result = await registrationsService.getRegistrations({ classId });
 
-                    // Get class name for display
-                    try {
-                         const classResult = await classesService.getById(classId);
-                         if (classResult.data) {
-                              const classData = convertFirestoreClass(classResult.data);
-                              setFilteredClassName(classData.name);
-                         }
-                    } catch (err) {
-                         console.error('Error fetching class info:', err);
-                    }
-               } else {
-                    // Get all registrations (ignore class filter for tutor tab)
-                    result = await registrationsService.getRegistrations();
-                    setFilteredClassName('');
-               }
-
-               if (result.error) {
-                    error('Lỗi', result.error);
-                    return;
-               }
-
-               // Convert FirestoreRegistration to Registration
-               const convertedRegistrations: Registration[] = result.data.map(reg => ({
-                    id: reg.id,
-                    userId: reg.userId,
-                    type: reg.type ?? 'class',
-                    classId: reg.classId,
-                    className: reg.className || '',
-                    // Map tutor-specific fields
-                    tutorType: reg.tutorType,
-                    tutorCriteria: reg.tutorCriteria || '',
-                    studentName: reg.studentName,
-                    studentPhone: reg.studentPhone,
-                    studentSchool: reg.studentSchool || '', // Trường học học viên
-                    parentName: reg.parentName,
-                    parentPhone: reg.parentPhone,
-                    parentAddress: reg.parentAddress, // Địa chỉ phụ huynh
-                    preferredSchedule: reg.preferredSchedule,
-                    notes: reg.notes,
-                    registrationDate: reg.createdAt?.toDate().toISOString() || '',
-                    status: reg.status,
-                    approvedBy: reg.approvedBy,
-                    approvedByName: reg.approvedByName, // Thêm mapping tên người xử lý
-                    approvedAt: reg.approvedAt?.toDate().toISOString(),
-                    rejectionReason: reg.rejectionReason,
-               }));
-
-               setRegistrations(convertedRegistrations);
-          } catch {
-               error('Lỗi', 'Không thể tải danh sách đăng ký');
-          } finally {
-               setLoading(false);
+        // Get class name for display
+        try {
+          const classResult = await classesService.getById(classId);
+          if (classResult.data) {
+            const classData = convertFirestoreClass(classResult.data);
+            setFilteredClassName(classData.name);
           }
-     };
+        } catch (err) {
+          console.error('Error fetching class info:', err);
+        }
+      } else {
+        // Get all registrations (ignore class filter for tutor tab)
+        result = await registrationsService.getRegistrations();
+        setFilteredClassName('');
+      }
 
-     const fetchStats = async () => {
-          try {
-               setStatsLoading(true);
-               const result = await registrationsService.getRegistrationStats();
-               if (result.error) {
-                    console.error('Error fetching stats:', result.error);
-                    return;
-               }
+      if (result.error) {
+        error('Lỗi', result.error);
+        return;
+      }
 
-               if (result.data) {
-                    setStats(result.data);
-               }
-          } catch (err) {
-               console.error('Error fetching registration stats:', err);
-          } finally {
-               setStatsLoading(false);
-          }
-     };
+      // Convert FirestoreRegistration to Registration
+      const convertedRegistrations: Registration[] = result.data.map(reg => ({
+        id: reg.id,
+        userId: reg.userId,
+        type: reg.type ?? 'class',
+        classId: reg.classId,
+        className: reg.className || '',
+        // Map tutor-specific fields
+        tutorType: reg.tutorType,
+        tutorCriteria: reg.tutorCriteria || '',
+        studentName: reg.studentName,
+        studentPhone: reg.studentPhone,
+        studentSchool: reg.studentSchool || '', // Trường học học viên
+        parentName: reg.parentName,
+        parentPhone: reg.parentPhone,
+        parentAddress: reg.parentAddress, // Địa chỉ phụ huynh
+        preferredSchedule: reg.preferredSchedule,
+        notes: reg.notes,
+        registrationDate: reg.createdAt?.toDate().toISOString() || '',
+        status: reg.status,
+        approvedBy: reg.approvedBy,
+        approvedByName: reg.approvedByName, // Thêm mapping tên người xử lý
+        approvedAt: reg.approvedAt?.toDate().toISOString(),
+        rejectionReason: reg.rejectionReason,
+      }));
 
-     useEffect(() => {
-          fetchRegistrations();
-          fetchStats();
-     }, [classId, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+      setRegistrations(convertedRegistrations);
+    } catch {
+      error('Lỗi', 'Không thể tải danh sách đăng ký');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-     const handleApprove = async (registrationId: string) => {
-          if (!user) return;
+  const fetchStats = async () => {
+    try {
+      setStatsLoading(true);
+      const result = await registrationsService.getRegistrationStats();
+      if (result.error) {
+        console.error('Error fetching stats:', result.error);
+        return;
+      }
 
-          const result = await registrationsService.approveRegistration(registrationId, user.uid, user.email || 'Admin');
-          if (result.error) {
-               throw new Error(result.error);
-          }
-     };
+      if (result.data) {
+        setStats(result.data);
+      }
+    } catch (err) {
+      console.error('Error fetching registration stats:', err);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
-     const handleReject = async (registrationId: string, reason: string) => {
-          if (!user) return;
+  useEffect(() => {
+    fetchRegistrations();
+    fetchStats();
+  }, [classId, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-          const result = await registrationsService.rejectRegistration(registrationId, reason, user.uid);
-          if (result.error) {
-               throw new Error(result.error);
-          }
-     };
+  const handleApprove = async (registrationId: string) => {
+    if (!user) return;
 
-     const handleApproveMultiple = async (registrationIds: string[]) => {
-          if (!user) return;
+    const result = await registrationsService.approveRegistration(
+      registrationId,
+      user.uid,
+      user.email || 'Admin'
+    );
+    if (result.error) {
+      throw new Error(result.error);
+    }
+  };
 
-          const result = await registrationsService.bulkApproveRegistrations(registrationIds, user.uid);
-          if (result.error) {
-               throw new Error(result.error);
-          }
-     };
+  const handleReject = async (registrationId: string, reason: string) => {
+    if (!user) return;
 
-     const handleRejectMultiple = async (registrationIds: string[], reason: string) => {
-          if (!user) return;
+    const result = await registrationsService.rejectRegistration(registrationId, reason, user.uid);
+    if (result.error) {
+      throw new Error(result.error);
+    }
+  };
 
-          // Since there's no bulk reject method, we'll reject one by one
-          const promises = registrationIds.map(id =>
-               registrationsService.rejectRegistration(id, reason, user.uid)
-          );
+  const handleApproveMultiple = async (registrationIds: string[]) => {
+    if (!user) return;
 
-          const results = await Promise.allSettled(promises);
-          const failures = results.filter(result => result.status === 'rejected');
+    const result = await registrationsService.bulkApproveRegistrations(registrationIds, user.uid);
+    if (result.error) {
+      throw new Error(result.error);
+    }
+  };
 
-          if (failures.length > 0) {
-               throw new Error(`Không thể từ chối ${failures.length} đăng ký`);
-          }
-     };
+  const handleRejectMultiple = async (registrationIds: string[], reason: string) => {
+    if (!user) return;
 
-     const handleRefresh = () => {
-          fetchRegistrations();
-          fetchStats();
-     };
+    // Since there's no bulk reject method, we'll reject one by one
+    const promises = registrationIds.map(id =>
+      registrationsService.rejectRegistration(id, reason, user.uid)
+    );
 
-     // Split registrations by type
-     const classRegistrations = registrations.filter(r => r.type === 'class');
-     const tutorRegistrations = registrations.filter(r => r.type === 'tutor_teacher' || r.type === 'tutor_student');
+    const results = await Promise.allSettled(promises);
+    const failures = results.filter(result => result.status === 'rejected');
 
-     return (
-          <PanelLayout>
-               <div className="space-y-6">
-                    {/* Page Header */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                         <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                   {classId && (
-                                        <Button
-                                             variant="ghost"
-                                             size="sm"
-                                             onClick={() => window.history.back()}
-                                             className="p-1"
-                                        >
-                                             <ArrowLeft className="h-4 w-4" />
-                                        </Button>
-                                   )}
-                                   <h2 className="text-2xl font-bold text-foreground">
-                                        {activeTab === 'class'
-                                             ? (classId ? `Đăng ký - ${filteredClassName}` : 'Quản lý Đăng ký lớp học')
-                                             : 'Quản lý Đăng ký tìm gia sư'
-                                        }
-                                   </h2>
-                              </div>
-                              <p className="text-muted-foreground">
-                                   {activeTab === 'class'
-                                        ? (classId
-                                             ? `Xem các đăng ký cho lớp học "${filteredClassName}"`
-                                             : 'Xem và xử lý các đăng ký lớp học từ học viên.')
-                                        : 'Xem và xử lý các yêu cầu tìm gia sư từ phụ huynh.'
-                                   }
-                              </p>
-                         </div>
-                         <Button onClick={handleRefresh} disabled={loading}>
-                              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                              Làm mới
-                         </Button>
-                    </div>
+    if (failures.length > 0) {
+      throw new Error(`Không thể từ chối ${failures.length} đăng ký`);
+    }
+  };
 
-                    {/* Tabs */}
-                    <div className="flex space-x-4 border-b mb-6">
-                         <Button variant={activeTab === 'class' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('class')}>
-                              Đăng ký lớp học
-                         </Button>
-                         <Button variant={activeTab === 'tutor' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('tutor')}>
-                              Tìm gia sư
-                         </Button>
-                    </div>
+  // Unified refresh handler used by global refresh event and internal table actions
+  const handleRefresh = () => {
+    fetchRegistrations();
+    fetchStats();
+  };
 
-                    {activeTab === 'class' && (
-                         <>
-                              {/* Stats Cards */}
-                              <RegistrationStats stats={stats} loading={statsLoading} />
-                              {/* Registrations Table (Class) */}
-                              <RegistrationTable
-                                   key="class"
-                                   registrations={classRegistrations}
-                                   loading={loading}
-                                   onApprove={handleApprove}
-                                   onReject={handleReject}
-                                   onApproveMultiple={handleApproveMultiple}
-                                   onRejectMultiple={handleRejectMultiple}
-                                   onRefresh={handleRefresh}
-                              />
-                         </>
-                    )}
+  // Listen for global refresh events dispatched from header
+  useEffect(() => {
+    const listener = () => handleRefresh();
+    window.addEventListener('panel-global-refresh', listener);
+    return () => window.removeEventListener('panel-global-refresh', listener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, classId]);
 
-                    {activeTab === 'tutor' && (
-                         <>
-                              {/* Registrations Table (Tutor) */}
-                              <RegistrationTable
-                                   key="tutor"
-                                   registrations={tutorRegistrations}
-                                   loading={loading}
-                                   onApprove={handleApprove}
-                                   onReject={handleReject}
-                                   onApproveMultiple={handleApproveMultiple}
-                                   onRejectMultiple={handleRejectMultiple}
-                                   onRefresh={handleRefresh}
-                                   isTutorTab={true}
-                              />
-                         </>
-                    )}
-               </div>
-          </PanelLayout>
-     );
+  // Split registrations by type
+  const classRegistrations = registrations.filter(r => r.type === 'class');
+  const tutorRegistrations = registrations.filter(
+    r => r.type === 'tutor_teacher' || r.type === 'tutor_student'
+  );
+
+  return (
+    <PanelLayout>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              {classId && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.history.back()}
+                  className="p-1"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
+              <h2 className="text-2xl font-bold text-foreground">
+                {activeTab === 'class'
+                  ? classId
+                    ? `Đăng ký - ${filteredClassName}`
+                    : 'Quản lý Đăng ký lớp học'
+                  : 'Quản lý Đăng ký tìm gia sư'}
+              </h2>
+            </div>
+            <p className="text-muted-foreground">
+              {activeTab === 'class'
+                ? classId
+                  ? `Xem các đăng ký cho lớp học "${filteredClassName}"`
+                  : 'Xem và xử lý các đăng ký lớp học từ học viên.'
+                : 'Xem và xử lý các yêu cầu tìm gia sư từ phụ huynh.'}
+            </p>
+          </div>
+          {/* Local refresh button removed; use global refresh control in header */}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex space-x-4 border-b mb-6">
+          <Button
+            variant={activeTab === 'class' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('class')}
+          >
+            Đăng ký lớp học
+          </Button>
+          <Button
+            variant={activeTab === 'tutor' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('tutor')}
+          >
+            Tìm gia sư
+          </Button>
+        </div>
+
+        {activeTab === 'class' && (
+          <>
+            {/* Stats Cards */}
+            <RegistrationStats stats={stats} loading={statsLoading} />
+            {/* Registrations Table (Class) */}
+            <RegistrationTable
+              key="class"
+              registrations={classRegistrations}
+              loading={loading}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onApproveMultiple={handleApproveMultiple}
+              onRejectMultiple={handleRejectMultiple}
+              onRefresh={handleRefresh}
+            />
+          </>
+        )}
+
+        {activeTab === 'tutor' && (
+          <>
+            {/* Registrations Table (Tutor) */}
+            <RegistrationTable
+              key="tutor"
+              registrations={tutorRegistrations}
+              loading={loading}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onApproveMultiple={handleApproveMultiple}
+              onRejectMultiple={handleRejectMultiple}
+              onRefresh={handleRefresh}
+              isTutorTab={true}
+            />
+          </>
+        )}
+      </div>
+    </PanelLayout>
+  );
 };
 
 export default RegistrationsPage;

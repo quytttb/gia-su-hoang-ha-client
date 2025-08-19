@@ -8,7 +8,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import { SpeedInsights } from "@vercel/speed-insights/react";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Lazy load pages for better performance
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -37,6 +37,7 @@ const PanelStaffPage = lazy(() => import('./pages/panel/StaffPage'));
 const PanelAnalyticsPage = lazy(() => import('./pages/panel/AnalyticsPage'));
 const PanelSettingsPage = lazy(() => import('./pages/panel/SettingsPage'));
 const PanelTutorsPage = lazy(() => import('./pages/panel/TutorsPage'));
+const PanelBlogPostsPage = lazy(() => import('./pages/panel/BlogPostsPage'));
 
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -61,7 +62,7 @@ const App = () => {
                   <Route path="/schedule" element={<SchedulePage />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path="/blog" element={<BlogPage />} />
-                  <Route path="/blog/:id" element={<BlogDetailPage />} />
+                  <Route path="/blog/:slug" element={<BlogDetailPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/test" element={<TestPage />} />
                   <Route path="/test-error" element={<TestErrorPage />} />
@@ -143,6 +144,14 @@ const App = () => {
                     element={
                       <ProtectedRoute requiredRoles={['admin', 'staff']}>
                         <PanelTutorsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/panel/blog-posts"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'staff']}>
+                        <PanelBlogPostsPage />
                       </ProtectedRoute>
                     }
                   />

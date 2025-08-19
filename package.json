@@ -21,6 +21,7 @@
     "test:seo:prod": "./scripts/test-seo.sh https://giasuhoangha.com",
     "migrate:mock-data": "node scripts/migrate-mock-data.cjs",
     "migrate:tutors": "node scripts/migrate-tutors.cjs",
+    "migrate:blog-posts": "node scripts/migrate-blog-posts.mjs",
     "init:center-info": "node scripts/init-center-info.cjs",
     "add:schedules": "node scripts/add-schedules.cjs",
     "create:courses": "node scripts/create-courses.cjs",
@@ -73,7 +74,10 @@
     "react-router-dom": "^6.20.0",
     "tailwind-merge": "^3.3.0",
     "vercel": "^44.5.5",
-    "web-vitals": "^5.0.1"
+    "web-vitals": "^5.0.1",
+    "marked": "^12.0.2",
+    "dompurify": "^3.1.7",
+    "slugify": "^1.6.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
