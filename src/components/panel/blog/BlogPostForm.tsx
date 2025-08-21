@@ -17,7 +17,9 @@ import { UploadService, UploadProgress } from '../../../services/uploadService';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../ui/select';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../../utils/cropImage';
 
 interface BlogPostFormProps {
   isOpen: boolean;
@@ -42,6 +44,12 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   const [featured, setFeatured] = useState(false);
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [coverImage, setCoverImage] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showCrop, setShowCrop] = useState(false);
+  const [cropImage, setCropImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any | null>(null);
   const [uploading, setUploading] = useState<UploadProgress>({ progress: 0, isUploading: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,18 +78,42 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
     }
   }, [post, isOpen]);
 
-  const handleUpload = async (file: File) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setCropImage(previewUrl);
+    setShowCrop(true);
+  };
+
+  const onCropComplete = (_area: any, pixels: any) => {
+    setCroppedAreaPixels(pixels);
+  };
+
+  const handleCropSave = async () => {
+    if (!cropImage || !croppedAreaPixels || !selectedFile) return;
     try {
-      const result = await UploadService.uploadFile(file, 'blog', setUploading, title || file.name);
+      const blob = await getCroppedImg(cropImage, croppedAreaPixels);
+      const fileName = selectedFile.name.replace(/\.[^.]+$/, '') + '-cropped.jpg';
+      const croppedFile = new File([blob], fileName, { type: blob.type });
+      // Upload cropped file
+      const result = await UploadService.uploadFile(
+        croppedFile,
+        'blog',
+        setUploading,
+        title || fileName
+      );
       setCoverImage(result.url);
+      setShowCrop(false);
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || 'Lỗi cắt ảnh');
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleUpload(file);
+  const handleRemoveImage = () => {
+    setCoverImage('');
+    setSelectedFile(null);
   };
 
   const tags = tagsInput
@@ -217,16 +249,39 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               </div>
               <div>
                 <Label>Ảnh bìa</Label>
-                <input type="file" accept="image/*" onChange={handleFileChange} />
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    id="blogCoverInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('blogCoverInput')?.click()}
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" /> {coverImage ? 'Đổi ảnh' : 'Chọn ảnh'}
+                  </Button>
+                  {coverImage && (
+                    <Button type="button" variant="ghost" size="sm" onClick={handleRemoveImage}>
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
                 {uploading.isUploading && (
-                  <div className="text-xs mt-1">Đang upload {uploading.progress}%</div>
+                  <div className="mt-1 text-xs">Đang upload {uploading.progress}%</div>
                 )}
                 {coverImage && (
-                  <img
-                    src={coverImage}
-                    alt="cover"
-                    className="mt-2 h-32 object-cover rounded border"
-                  />
+                  <div className="mt-2">
+                    <img
+                      src={coverImage}
+                      alt="cover"
+                      className="h-32 w-auto object-contain rounded border cursor-zoom-in"
+                    />
+                  </div>
                 )}
               </div>
               <div className="text-sm text-muted-foreground">
@@ -257,6 +312,34 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Lưu
             </Button>
           </DialogFooter>
+          {showCrop && (
+            <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70">
+              <div className="bg-background border rounded-lg p-4 w-full max-w-xl">
+                <div className="relative w-full h-80 bg-black/80 rounded">
+                  <Cropper
+                    image={cropImage!}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={3 / 1}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <div className="flex-1" />
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => setShowCrop(false)}>
+                      Hủy
+                    </Button>
+                    <Button type="button" onClick={handleCropSave}>
+                      Cắt & tải lên
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       </DialogContent>
     </Dialog>
