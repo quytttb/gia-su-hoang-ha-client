@@ -20,6 +20,7 @@ import DOMPurify from 'dompurify';
 import { Loader2, Upload, X } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../../utils/cropImage';
+import { Dialog as CropDialog, DialogContent as CropDialogContent } from '../../ui/dialog';
 
 interface BlogPostFormProps {
   isOpen: boolean;
@@ -312,23 +313,41 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Lưu
             </Button>
           </DialogFooter>
+          {/* Crop Dialog */}
           {showCrop && (
-            <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70">
-              <div className="bg-background border rounded-lg p-4 w-full max-w-xl">
-                <div className="relative w-full h-80 bg-black/80 rounded">
-                  <Cropper
-                    image={cropImage!}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={3 / 1}
-                    onCropChange={setCrop}
-                    onZoomChange={setZoom}
-                    onCropComplete={onCropComplete}
-                  />
+            <CropDialog open={showCrop} onOpenChange={setShowCrop}>
+              <CropDialogContent className="max-w-2xl">
+                <div className="relative w-full h-80 bg-black">
+                  {cropImage && (
+                    <Cropper
+                      image={cropImage}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={3 / 1}
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onCropComplete={onCropComplete}
+                    />
+                  )}
                 </div>
-                <div className="flex justify-between items-center mt-4">
-                  <div className="flex-1" />
-                  <div className="flex gap-2">
+                <div className="mt-4 flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <Label htmlFor="zoomRange" className="text-sm">
+                      Zoom
+                    </Label>
+                    <input
+                      id="zoomRange"
+                      type="range"
+                      min={1}
+                      max={3}
+                      step={0.1}
+                      value={zoom}
+                      onChange={e => setZoom(Number(e.target.value))}
+                      className="flex-1"
+                    />
+                    <span className="text-xs w-10 text-right">{zoom.toFixed(1)}x</span>
+                  </div>
+                  <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setShowCrop(false)}>
                       Hủy
                     </Button>
@@ -337,8 +356,8 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                     </Button>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CropDialogContent>
+            </CropDialog>
           )}
         </form>
       </DialogContent>
