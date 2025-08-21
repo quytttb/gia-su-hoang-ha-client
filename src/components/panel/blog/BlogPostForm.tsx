@@ -54,6 +54,9 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   const [uploading, setUploading] = useState<UploadProgress>({ progress: 0, isUploading: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Track newly uploaded (unsaved) Cloudinary image for cleanup if user cancels
+  const [tempUploadedCoverUrl, setTempUploadedCoverUrl] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (post) {
@@ -77,7 +80,21 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
       setCoverImage('');
       setError(null);
     }
+    // Reset temp tracking on open
+    if (isOpen) {
+      setTempUploadedCoverUrl(null);
+      setSaved(false);
+    }
   }, [post, isOpen]);
+
+  // Cleanup on unmount (component removal) if user never saved
+  useEffect(() => {
+    return () => {
+      if (!saved && tempUploadedCoverUrl && tempUploadedCoverUrl !== (post?.coverImage?.url || '')) {
+        UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+      }
+    };
+  }, [saved, tempUploadedCoverUrl, post]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -105,7 +122,13 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         setUploading,
         title || fileName
       );
+      // If there was a previous unsaved uploaded image (re-crop), delete it first
+      if (tempUploadedCoverUrl && tempUploadedCoverUrl !== result.url && tempUploadedCoverUrl !== (post?.coverImage?.url || '')) {
+        UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+      }
       setCoverImage(result.url);
+      setTempUploadedCoverUrl(result.url); // Track for potential cleanup
+      setSaved(false);
       setShowCrop(false);
     } catch (e: any) {
       setError(e.message || 'Lỗi cắt ảnh');
@@ -172,6 +195,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
           coverImage: coverImage ? { url: coverImage } : undefined,
         });
       }
+      setSaved(true);
       onSaved();
       onClose();
     } catch (e: any) {
@@ -182,7 +206,18 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          // If user is closing without saving and we have a temp uploaded image different from original, delete it
+            if (!saved && tempUploadedCoverUrl && tempUploadedCoverUrl !== (post?.coverImage?.url || '')) {
+              UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+            }
+          onClose();
+        }
+      }}
+    >
       <DialogContent className="max-w-5xl h-[90vh] overflow-y-auto text-black dark:text-white">
         <DialogHeader>
           <DialogTitle>{post ? 'Chỉnh sửa bài viết' : 'Bài viết mới'}</DialogTitle>

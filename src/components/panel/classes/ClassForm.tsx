@@ -63,6 +63,9 @@ const ClassForm: React.FC<ClassFormProps> = ({
      const [successMessage, setSuccessMessage] = useState<string | null>(null);
      const fileInputRef = useRef<HTMLInputElement>(null);
      const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+     // Track temporary uploaded image URL (unsaved) for cleanup
+     const [tempUploadedUrl, setTempUploadedUrl] = useState<string | null>(null);
+     const [saved, setSaved] = useState(false);
 
      // Cập nhật formData khi classItem thay đổi (khi mở form sửa)
      useEffect(() => {
@@ -96,7 +99,18 @@ const ClassForm: React.FC<ClassFormProps> = ({
           setSelectedFile(null);
           setUploadProgress({ progress: 0, isUploading: false });
           setSuccessMessage(null);
+          setTempUploadedUrl(null);
+          setSaved(false);
      }, [classItem, isOpen]);
+
+     // Cleanup on unmount if not saved
+     useEffect(() => {
+          return () => {
+               if (!saved && tempUploadedUrl && tempUploadedUrl !== (classItem?.imageUrl || '')) {
+                    UploadService.deleteFile(tempUploadedUrl).catch(() => {});
+               }
+          };
+     }, [saved, tempUploadedUrl, classItem]);
 
      // Xử lý thay đổi input
      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -208,6 +222,7 @@ const ClassForm: React.FC<ClassFormProps> = ({
                     }
                     finalImageUrl = uploadedUrl;
                     console.log('Upload successful:', finalImageUrl);
+                    setTempUploadedUrl(uploadedUrl);
                }
 
                // Save class with final image URL
@@ -215,6 +230,7 @@ const ClassForm: React.FC<ClassFormProps> = ({
                     ...formData,
                     imageUrl: finalImageUrl,
                });
+                   setSaved(true);
 
                // Show success message briefly before closing
                setSuccessMessage(classItem ? 'Lớp học đã được cập nhật thành công!' : 'Lớp học đã được tạo thành công!');
@@ -270,6 +286,9 @@ const ClassForm: React.FC<ClassFormProps> = ({
                     formData.price
                );
                console.log('Upload completed:', result);
+               if (tempUploadedUrl && tempUploadedUrl !== result.url && tempUploadedUrl !== (classItem?.imageUrl || '')) {
+                    UploadService.deleteFile(tempUploadedUrl).catch(() => {});
+               }
                return result.url;
           } catch (error: any) {
                console.error('Upload error:', error);
@@ -296,7 +315,17 @@ const ClassForm: React.FC<ClassFormProps> = ({
      const isLoading = uploadProgress.isUploading || loading;
 
      return (
-          <Dialog open={isOpen} onOpenChange={onClose}>
+          <Dialog
+               open={isOpen}
+               onOpenChange={(open) => {
+                    if (!open) {
+                         if (!saved && tempUploadedUrl && tempUploadedUrl !== (classItem?.imageUrl || '')) {
+                              UploadService.deleteFile(tempUploadedUrl).catch(() => {});
+                         }
+                         onClose();
+                    }
+               }}
+          >
                <DialogContent className="md:max-w-[900px] max-w-3xl">
                     <DialogHeader>
                          <DialogTitle>{classItem ? 'Chỉnh sửa lớp học' : 'Thêm lớp học mới'}</DialogTitle>

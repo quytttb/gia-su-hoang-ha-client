@@ -64,6 +64,9 @@ const BannerForm: React.FC<BannerFormProps> = ({
      const [zoom, setZoom] = useState(1);
      const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedAreaPixels | null>(null);
      const [cropImage, setCropImage] = useState<string | null>(null);
+     // Track temporary uploaded image (after upload but before save) for cleanup if user cancels
+     const [tempUploadedUrl, setTempUploadedUrl] = useState<string | null>(null);
+     const [saved, setSaved] = useState(false);
 
      useEffect(() => {
           if (banner) {
@@ -90,7 +93,18 @@ const BannerForm: React.FC<BannerFormProps> = ({
           setUploadProgress({ progress: 0, isUploading: false });
           setIsSubmitting(false);
           setSuccessMessage(null);
+          setTempUploadedUrl(null);
+          setSaved(false);
      }, [banner, isOpen]);
+
+     // Cleanup on unmount if not saved
+     useEffect(() => {
+          return () => {
+               if (!saved && tempUploadedUrl && tempUploadedUrl !== (banner?.imageUrl || '')) {
+                    UploadService.deleteFile(tempUploadedUrl).catch(() => {});
+               }
+          };
+     }, [saved, tempUploadedUrl, banner]);
 
      const validateForm = () => {
           const newErrors: Record<string, string> = {};
@@ -138,6 +152,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
                     }
                     finalImageUrl = uploadedUrl;
                     console.log('Upload successful:', finalImageUrl);
+                    setTempUploadedUrl(uploadedUrl); // track for cleanup
                }
 
                // Save banner with final image URL
@@ -147,6 +162,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
                     link: formData.link === 'none' ? '' : formData.link,
                     imageUrl: finalImageUrl,
                });
+               setSaved(true);
 
                // Show success message briefly before closing
                setSuccessMessage(banner ? 'Banner đã được cập nhật thành công!' : 'Banner đã được tạo thành công!');
@@ -236,6 +252,10 @@ const BannerForm: React.FC<BannerFormProps> = ({
                     formData.order
                );
                console.log('Upload completed:', result);
+               // If previously uploaded temp (replacing), delete the old one
+               if (tempUploadedUrl && tempUploadedUrl !== result.url && tempUploadedUrl !== (banner?.imageUrl || '')) {
+                    UploadService.deleteFile(tempUploadedUrl).catch(() => {});
+               }
                return result.url;
           } catch (error: any) {
                console.error('Upload error:', error);
@@ -263,7 +283,18 @@ const BannerForm: React.FC<BannerFormProps> = ({
 
      return (
           <>
-               <Dialog open={isOpen} onOpenChange={onClose}>
+               <Dialog
+                    open={isOpen}
+                    onOpenChange={(open) => {
+                         if (!open) {
+                              // If closing without saving, delete temp uploaded
+                              if (!saved && tempUploadedUrl && tempUploadedUrl !== (banner?.imageUrl || '')) {
+                                   UploadService.deleteFile(tempUploadedUrl).catch(() => {});
+                              }
+                              onClose();
+                         }
+                    }}
+               >
                     <DialogContent className="md:max-w-[900px] max-w-3xl">
                          <DialogHeader>
                               <DialogTitle>
