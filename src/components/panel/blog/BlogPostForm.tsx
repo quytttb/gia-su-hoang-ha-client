@@ -96,7 +96,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         tempUploadedCoverUrl &&
         tempUploadedCoverUrl !== (post?.coverImage?.url || '')
       ) {
-        UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+        UploadService.deleteFile(tempUploadedCoverUrl).catch(() => { });
       }
     };
   }, [saved, tempUploadedCoverUrl, post]);
@@ -133,7 +133,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         tempUploadedCoverUrl !== result.url &&
         tempUploadedCoverUrl !== (post?.coverImage?.url || '')
       ) {
-        UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+        UploadService.deleteFile(tempUploadedCoverUrl).catch(() => { });
       }
       setCoverImage(result.url);
       setTempUploadedCoverUrl(result.url); // Track for potential cleanup
@@ -270,7 +270,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
             tempUploadedCoverUrl &&
             tempUploadedCoverUrl !== (post?.coverImage?.url || '')
           ) {
-            UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+            UploadService.deleteFile(tempUploadedCoverUrl).catch(() => { });
           }
           onClose();
         }
@@ -404,10 +404,19 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                   <span className="text-xs text-muted-foreground">Đang tải {contentUploading.progress}%</span>
                 )}
               </div>
+              <div className="text-xs text-muted-foreground mb-2">
+                Hỗ trợ Markdown: <code className="font-mono bg-muted px-1 rounded">**đậm**</code>,
+                <code className="font-mono bg-muted px-1 rounded ml-1">*nghiêng*</code>,
+                <code className="font-mono bg-muted px-1 rounded ml-1">- danh sách</code>,
+                <code className="font-mono bg-muted px-1 rounded ml-1">[link](https://...)</code>,
+                <code className="font-mono bg-muted px-1 rounded ml-1">![alt](url)</code>.
+                Nhấn "Chèn ảnh" để tải ảnh và tự chèn cú pháp vào vị trí con trỏ.
+              </div>
               <Textarea
                 value={contentMarkdown}
                 onChange={e => setContentMarkdown(e.target.value)}
                 ref={contentTextareaRef}
+                placeholder="Viết nội dung bằng Markdown...\nVí dụ: # Tiêu đề chính\n\nĐoạn văn...\n\n- Gạch đầu dòng 1\n- Gạch đầu dòng 2"
                 className="flex-1 min-h-[300px] font-mono text-sm text-black dark:text-white"
               />
             </div>
