@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import BlogCard from '../components/blog/BlogCard';
 import { Badge } from '../components/ui/badge';
@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { blogCategories } from '../constants/blogData';
 import { BlogService } from '../services/blogService';
+import ErrorDisplay from '../components/shared/ErrorDisplay';
 
 // Minimal X (Twitter) icon
 const XIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
@@ -37,6 +38,7 @@ const XIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
 
 const BlogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [post, setPost] = useState<any | null>(null);
   const [latestPosts, setLatestPosts] = useState<any[]>([]);
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
@@ -46,12 +48,31 @@ const BlogDetailPage: React.FC = () => {
     let active = true;
     const run = async () => {
       if (!slug) return;
+      const normalizedSlug = decodeURIComponent(slug).trim();
       setLoading(true);
       try {
-        let p = await BlogService.getPostBySlug(slug);
+        let p: any | null = null;
+        try {
+          p = await BlogService.getPostBySlug(normalizedSlug);
+        } catch {
+          p = null;
+        }
         // Fallback: if no post found by slug, try interpret param as document ID
         if (!p) {
-          p = await BlogService.getPostById(slug, true); // include drafts so redirect logic can decide
+          try {
+            // Try as published id first
+            p = await BlogService.getPostById(normalizedSlug, false);
+          } catch {
+            p = null;
+          }
+          if (!p) {
+            try {
+              // Finally try including drafts (may be denied by rules for public users)
+              p = await BlogService.getPostById(normalizedSlug, true);
+            } catch {
+              p = null;
+            }
+          }
         }
         if (!active) return;
         if (p) {
@@ -112,7 +133,20 @@ const BlogDetailPage: React.FC = () => {
   }
 
   if (!loading && !post) {
-    return <Navigate to="/blog" replace />;
+    return (
+      <Layout>
+        <div className="container-custom py-16">
+          <ErrorDisplay
+            fullPage={false}
+            type="warning"
+            message="Không tìm thấy bài viết"
+            details="Bài viết có thể đã bị xóa hoặc URL không đúng."
+            retryLabel="Về trang Blog"
+            onRetry={() => navigate('/blog')}
+          />
+        </div>
+      </Layout>
+    );
   }
 
   const formatDate = (dateValue: any) => {

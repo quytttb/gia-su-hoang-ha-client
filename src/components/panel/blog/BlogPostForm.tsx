@@ -90,7 +90,11 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   // Cleanup on unmount (component removal) if user never saved
   useEffect(() => {
     return () => {
-      if (!saved && tempUploadedCoverUrl && tempUploadedCoverUrl !== (post?.coverImage?.url || '')) {
+      if (
+        !saved &&
+        tempUploadedCoverUrl &&
+        tempUploadedCoverUrl !== (post?.coverImage?.url || '')
+      ) {
         UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
       }
     };
@@ -123,7 +127,11 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         title || fileName
       );
       // If there was a previous unsaved uploaded image (re-crop), delete it first
-      if (tempUploadedCoverUrl && tempUploadedCoverUrl !== result.url && tempUploadedCoverUrl !== (post?.coverImage?.url || '')) {
+      if (
+        tempUploadedCoverUrl &&
+        tempUploadedCoverUrl !== result.url &&
+        tempUploadedCoverUrl !== (post?.coverImage?.url || '')
+      ) {
         UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
       }
       setCoverImage(result.url);
@@ -208,12 +216,16 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(open) => {
+      onOpenChange={open => {
         if (!open) {
           // If user is closing without saving and we have a temp uploaded image different from original, delete it
-            if (!saved && tempUploadedCoverUrl && tempUploadedCoverUrl !== (post?.coverImage?.url || '')) {
-              UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
-            }
+          if (
+            !saved &&
+            tempUploadedCoverUrl &&
+            tempUploadedCoverUrl !== (post?.coverImage?.url || '')
+          ) {
+            UploadService.deleteFile(tempUploadedCoverUrl).catch(() => {});
+          }
           onClose();
         }
       }}

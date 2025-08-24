@@ -181,9 +181,25 @@ export class BlogService {
   }
 
   static async getPostBySlug(slug: string, includeDraft = false): Promise<BlogPost | null> {
-    const qSnap = await getDocs(
-      query(collection(this.db, POSTS_COLLECTION), where('slug', '==', slug), limit(1))
-    );
+    const constraints: any[] = [where('slug', '==', slug)];
+    if (!includeDraft) constraints.push(where('status', '==', 'published'));
+    constraints.push(limit(1));
+
+    let qSnap = await getDocs(query(collection(this.db, POSTS_COLLECTION), ...constraints));
+    // Fallback: if includeDraft=false yielded nothing, try without status to handle inconsistent data,
+    // but still prefer a published document if present among duplicates.
+    if (qSnap.empty && !includeDraft) {
+      const altSnap = await getDocs(
+        query(collection(this.db, POSTS_COLLECTION), where('slug', '==', slug), limit(5))
+      );
+      if (altSnap.empty) return null;
+      // Try pick a published one first
+      const publishedDoc = altSnap.docs.find(d => (d.data() as any).status === 'published');
+      const chosen = publishedDoc || altSnap.docs[0];
+      const data = chosen.data() as any;
+      if (!includeDraft && data.status !== 'published') return null;
+      return { id: chosen.id, ...data } as BlogPost;
+    }
     if (qSnap.empty) return null;
     const docSnap = qSnap.docs[0];
     const data = docSnap.data() as any;

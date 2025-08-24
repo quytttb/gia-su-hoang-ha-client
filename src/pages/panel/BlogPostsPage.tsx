@@ -49,9 +49,8 @@ const BlogPostsPage: React.FC = () => {
       } finally {
         setLoading(false);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [filter.categoryId, filter.status, filter.search, cursor, posts]
+    [filter.categoryId, filter.status, filter.search, cursor, posts, error]
   );
 
   useEffect(() => {

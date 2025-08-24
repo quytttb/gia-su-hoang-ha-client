@@ -24,7 +24,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, variant = 'default', classNam
 
   const imageUrl: string = post.imageUrl || post.coverImage?.url || '/images/placeholder-logo.svg';
   const author: string = post.author || post.authorName || 'Ẩn danh';
-  const slug: string = post.slug || post.id;
+  const linkParam: string = post.slug || post.id;
 
   const resolveDate = () => {
     const d = post.publishedAt || post.createdAt || post.updatedAt;
@@ -44,7 +44,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, variant = 'default', classNam
 
   if (variant === 'featured') {
     return (
-      <Link to={`/blog/${slug}`} className={className}>
+      <Link to={`/blog/${encodeURIComponent(linkParam)}`} className={className}>
         <Card
           className={`${baseCardClasses} h-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-primary/20 hover:border-primary/40`}
         >
@@ -124,7 +124,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, variant = 'default', classNam
 
   if (variant === 'compact') {
     return (
-      <Link to={`/blog/${slug}`} className={className}>
+      <Link to={`/blog/${encodeURIComponent(linkParam)}`} className={className}>
         <Card className={`${baseCardClasses} h-full`}>
           <div className="flex gap-3 p-3">
             <div className="flex-shrink-0 w-20 h-14 rounded-md overflow-hidden">
@@ -167,7 +167,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, variant = 'default', classNam
 
   // Default variant
   return (
-    <Link to={`/blog/${slug}`} className={className}>
+    <Link to={`/blog/${encodeURIComponent(linkParam)}`} className={className}>
       <Card className={`${baseCardClasses} h-full`}>
         <div className="aspect-video relative overflow-hidden">
           <img
