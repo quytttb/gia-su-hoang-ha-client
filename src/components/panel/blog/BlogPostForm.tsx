@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -52,6 +52,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any | null>(null);
   const [uploading, setUploading] = useState<UploadProgress>({ progress: 0, isUploading: false });
+  const [contentUploading, setContentUploading] = useState<UploadProgress>({ progress: 0, isUploading: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Track newly uploaded (unsaved) Cloudinary image for cleanup if user cancels
@@ -146,6 +147,51 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   const handleRemoveImage = () => {
     setCoverImage('');
     setSelectedFile(null);
+  };
+
+  // Insert image into markdown content at current cursor position
+  const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const insertTextAtCursor = (textToInsert: string) => {
+    const el = contentTextareaRef.current;
+    if (!el) {
+      setContentMarkdown(prev => prev + textToInsert);
+      return;
+    }
+    const start = el.selectionStart || 0;
+    const end = el.selectionEnd || 0;
+    const before = contentMarkdown.slice(0, start);
+    const after = contentMarkdown.slice(end);
+    const next = `${before}${textToInsert}${after}`;
+    setContentMarkdown(next);
+    // restore caret after inserted text
+    const nextPos = start + textToInsert.length;
+    requestAnimationFrame(() => {
+      try {
+        el.focus();
+        el.setSelectionRange(nextPos, nextPos);
+      } catch {
+        // ignore caret restore errors in unsupported environments
+      }
+    });
+  };
+
+  const onContentImageSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // reset value to allow re-selecting same file next time
+    e.currentTarget.value = '';
+    if (!file) return;
+    try {
+      setError(null);
+      const result = await UploadService.uploadFile(file, 'blog', setContentUploading, title || file.name);
+      const alt = (file.name || 'image').replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+      const md = `\n\n![${alt}](${result.url})\n\n`;
+      insertTextAtCursor(md);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi tải ảnh nội dung');
+    } finally {
+      setContentUploading({ progress: 0, isUploading: false });
+    }
   };
 
   const tags = tagsInput
@@ -338,9 +384,30 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
             </div>
             <div className="flex flex-col">
               <Label>Nội dung (Markdown)</Label>
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  id="blogContentImageInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={onContentImageSelected}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('blogContentImageInput')?.click()}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" /> Chèn ảnh
+                </Button>
+                {contentUploading.isUploading && (
+                  <span className="text-xs text-muted-foreground">Đang tải {contentUploading.progress}%</span>
+                )}
+              </div>
               <Textarea
                 value={contentMarkdown}
                 onChange={e => setContentMarkdown(e.target.value)}
+                ref={contentTextareaRef}
                 className="flex-1 min-h-[300px] font-mono text-sm text-black dark:text-white"
               />
             </div>
